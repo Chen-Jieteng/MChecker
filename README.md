@@ -1,7 +1,7 @@
 # M-Content-Review （Machine Content Review）
 ## 项目描述
 开源机审模型全流程项目，模拟针对通用APP的短视频、图文、广告的机审模型架构的实践及优化，以提供现有模型框架一个新路径及思路。
-测试APP为开源项目douyin：本项目对douyin（https://github.com/zyronon/douyin）的页面进行了增删查改，添加了模拟广告运作机制。
+测试APP为开源项目douyin：https://github.com/zyronon/douyin，本项目对douyin的页面进行了增删查改，添加了模拟广告运作机制。
 
 ## 项目架构
 视频/音频/文本输入 --(视频抽帧+音频转写等)--> 三种高维数据的多模态解析层 --(Structured context生成)--> Prompt审核引擎（大模型架构和大模型本身）--(效果分析和可视化)
