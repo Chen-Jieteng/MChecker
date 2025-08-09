@@ -24,48 +24,49 @@
 - 本该在高流量池的优质内容，却出现在低流量池的内容
 
 ## 缺陷分析的证据来源
-- 收集观察实例，均为APP内真实视频，通过收藏视频在特定观察周期（2025年8月8日10:35 - 8月10日23:59）内观察视频是否下架，再通过对这些不符合审核标准却未被精准下架的视频注入本项目模型测试，研究分析其表现和审核效果。
+收集观察实例，均为APP内真实视频，通过收藏视频在特定观察周期（2025年8月8日10:35 - 8月10日23:59）内观察视频是否下架，再通过对这些不符合审核标准却未被精准下架的视频注入本项目模型测试，研究分析其表现和审核效果。
 
 ## 可能用到的架构
 视频/音频/文本输入 --(视频抽帧+音频转写等)--> 三种高维数据的多模态解析层 --(Structured context生成)--> Prompt审核引擎（大模型架构和大模型本身）--(效果分析和可视化)
 
 ## 技术选型
-1. 模型层：多模态+LLM
-视频/图像识别：YOLOv10，NudeNet v2，或者OpenAI CLIP/Qwen-VL-Max
-音频转写：whisper-v3-large或者sensevoice
-大语言模型
-- 国际版本：GPT系列、claude系列、gemini系列；
-- 国产版本：qwen2.5-72B，Yi-Large-Turbo、GLM-4-Long
-推理框架：vLLM
-3. 工程层：prompt管理 + 数据流 
-prompt管理：langchain（智能体用），llamaindex（多模态用）
-3. 数据处理
-视频抽帧：ffmpeg和PyAV
-数据存储：DuckDB轻量分析 或者 ClikeHouse大规模分析
-流式处理：Kafka和Flink
-4. 部署
-FastAPI，通过REST和WebSocket实现
+模型层：多模态+LLM
+- 视频/图像识别：YOLOv10，NudeNet v2，或者OpenAI CLIP/Qwen-VL-Max
+- 音频转写：whisper-v3-large或者sensevoice
+- 大语言模型：国际版本：GPT系列、claude系列、gemini系列；国产版本：qwen2.5-72B，Yi-Large-Turbo、GLM-4-Long
+- 推理框架：vLLM
+
+工程层：prompt管理 + 数据流 
+- prompt管理：langchain（智能体用），llamaindex（多模态用）
+
+数据处理
+- 视频抽帧：ffmpeg和PyAV
+- 数据存储：DuckDB轻量分析 或者 ClikeHouse大规模分析
+- 流式处理：Kafka和Flink
+
+部署
+- FastAPI，通过REST和WebSocket实现
 
 ## 可视化层
-前端：Streamlist或者Next.js混搭ShadCN UI
-图标：ECharts或Plotly Dash
+- 前端：Streamlist或者Next.js混搭ShadCN UI
+- 图表：ECharts或Plotly Dash
 
 ## 机审内容范围定义
-短视频：视频流、图片、文本、语音统一对齐的视频内容实体
-评论内容：文本、图片、评论树节点上下文（保证只删除违规的上下文，不会误删整个评论）
-广告内容：视频流、图片、文本、语音统一对齐的广告内容实体 
+- 短视频：视频流、图片、文本、语音统一对齐的视频内容实体
+- 评论内容：文本、图片、评论树节点上下文（保证只删除违规的上下文，不会误删整个评论）
+- 广告内容：视频流、图片、文本、语音统一对齐的广告内容实体 
 
 ## Prompt审核分层机制
-Prompt L1：直接审核
-Prompt L2：违规风险分类、输出分数
-Prompt L3：业务规则（法律敏感内容等）
+- Prompt L1：直接审核
+- Prompt L2：违规风险分类、输出分数
+- Prompt L3：业务规则（法律敏感内容等）
 
 ## 数据来源
-NudeNet数据集（主要是图片）
-OpenNSFW2（普通训练集）
-AVA数据集（黄暴内容）
-COCO+任务检测模型（非违规，但是可做正常人像对照集）
-YouTube-8M（擦边视频）
+- NudeNet数据集（主要是图片）
+- OpenNSFW2（普通训练集）
+- AVA数据集（黄暴内容）
+- COCO+任务检测模型（非违规，但是可做正常人像对照集）
+- YouTube-8M（擦边视频）
 
 ## 过滤标准
 - 文本：敏感词、涉政/色情/暴恐、违禁文案
@@ -78,8 +79,8 @@ YouTube-8M（擦边视频）
 WebUI用风险分数输出：输出违规或者不违规，给出风险等级（100满分）
 
 ## 文件输出
-模型对照表：LLM和LMM等、MoE模型对照组；包括Qwen，Open，豆包，DeepSeek等不同版本的对照实验，写出质检和模型表现相关报告
-使用小规模（500-800条）人工标注评估集，合成数据进行Prompt压力测试，统计指标（准确率、召回率、误杀率、风险评分；注意这些数据要有一致性，不可没有联系或写假数据）
+- 模型对照表：LLM和LMM等、MoE模型对照组；包括Qwen，Open，豆包，DeepSeek等不同版本的对照实验，写出质检和模型表现相关报告
+- 使用小规模（500-800条）人工标注评估集，合成数据进行Prompt压力测试，统计指标（准确率、召回率、误杀率、风险评分；注意这些数据要有一致性，不可没有联系或写假数据）
 
 ## 隐私保护措施
 - 对所有收集的测试样本作者隐私信息（发表者ID等）进行模糊处理
