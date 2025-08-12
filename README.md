@@ -5,7 +5,8 @@
 - 本项目对douyin的页面进行了增删查改，添加了模拟广告运作机制。
 
 ## 项目架构
-视频/音频/文本输入 --(视频抽帧+音频转写等)--> 三种高维数据的多模态解析层 --(Structured context生成)--> Prompt审核引擎（大模型架构和大模型本身）--(效果分析和可视化)
+![进度](https://github.com/Chen-Jieteng/MChecker/blob/main/%E4%B8%8B%E8%BD%BD.png)
+
 
 ## 审核平台页面
 
