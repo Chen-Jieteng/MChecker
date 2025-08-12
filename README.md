@@ -2,7 +2,8 @@
 ## 项目描述
 开源机审模型全流程项目，模拟针对通用APP的短视频、图文、广告的机审模型架构的实践及优化，以提供现有模型框架一个新路径及思路。
 - 测试APP为开源项目douyin：https://github.com/zyronon/douyin
-- 本项目对douyin的页面进行了增删查改，添加了模拟广告运作机制。
+- 本项目对douyin的页面进行了增删查改。
+- 其余部分（审核员控制面板、报告生成系统、后端服务器代码、MChecker智能体）为原创。
 
 ## 项目架构
 ![进度](https://github.com/Chen-Jieteng/MChecker/blob/main/%E4%B8%8B%E8%BD%BD.png)
