@@ -193,6 +193,6 @@ RAG
 - 项目遵守MIT协议
 
 ## 开源参与者
-edwin99
+edwin99（Chen-Jieteng）
 
 
