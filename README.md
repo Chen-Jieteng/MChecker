@@ -61,7 +61,8 @@
 <img src="https://github.com/Chen-Jieteng/MChecker/blob/main/readme_images/%E4%BA%BA%E5%B7%A5%E5%AE%A1%E6%A0%B8.png" width="100%">
  
 - 审核结果窗口
-  
+<img src="https://github.com/Chen-Jieteng/MChecker/blob/main/readme_images/%E5%AE%A1%E6%A0%B8%E7%BB%93%E6%9E%9C.png" width="100%">
+
 
 - 文档生成
 <img src="https://github.com/Chen-Jieteng/MChecker/blob/main/readme_images/%E6%99%BA%E8%83%BD%E6%96%87%E6%A1%A3%E7%94%9F%E6%88%90.png" width="60%">
