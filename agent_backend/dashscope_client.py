@@ -3,7 +3,6 @@ from typing import List, Dict, Any
 from itertools import cycle
 from dotenv import load_dotenv
 
-# Load .env from the correct path
 load_dotenv(os.path.join(os.path.dirname(__file__), '.env'))
 
 _BASE = "https://dashscope.aliyuncs.com/api/v1"
@@ -22,18 +21,14 @@ class KeyRotator:
 
 class DSClient:
     def __init__(self, text_model: str|None=None, vl_model: str|None=None, asr_model: str|None=None):
-        # models
         self.text_model = text_model or os.getenv('DASHSCOPE_TEXT_MODEL', 'qwq-plus-latest')
         self.vl_model = vl_model or os.getenv('DASHSCOPE_VL_MODEL', 'qwen-vl-plus')
         self.asr_model = asr_model or os.getenv('DASHSCOPE_ASR_MODEL', 'qwen-audio-asr')
         
-        # Debug: 打印当前使用的模型配置
         print(f"🔧 DSClient模型配置:")
         print(f"   文本模型: {self.text_model}")
         print(f"   视觉模型: {self.vl_model}")
         print(f"   语音模型: {self.asr_model}")
-        # generation params
-        # defaults + environment overrides
         self.temperature = 0.3
         self.top_p = 0.9
         try:
@@ -62,7 +57,6 @@ class DSClient:
                 async with httpx.AsyncClient(timeout=timeout) as client:
                     r = await client.post(url, headers=self._headers(key), json=json)
                     if r.status_code == 400:
-                        # Log detailed 400 error for debugging
                         error_details = r.text
                         logger.error(f"DashScope 400 Bad Request - URL: {url}")
                         logger.error(f"Request payload: {json}")
@@ -92,7 +86,6 @@ class DSClient:
 
     async def qwen_text(self, prompt: str, result_format: str='json'):
         url = f"{_BASE}/services/aigc/text-generation/generation"
-        # 优先 text_model，失败时由上层捕获后可切换
         params = {"result_format": result_format}
         if self.temperature is not None:
             params["temperature"] = self.temperature
@@ -118,7 +111,6 @@ class VisionDSClient:
         self.temperature = 0.3
         self.top_p = 0.9
         
-        # 读取环境变量覆盖
         try:
             if os.getenv('DASHSCOPE_TEMPERATURE'):
                 self.temperature = float(os.getenv('DASHSCOPE_TEMPERATURE'))
@@ -138,7 +130,6 @@ class VisionDSClient:
         import logging
         logger = logging.getLogger(__name__)
         
-        # 获取API KEY
         key_stats = await coordinator.acquire_api_key(timeout=30.0)
         if not key_stats:
             raise RuntimeError("无法获取可用的视觉API KEY，所有KEY都达到并发限制")
@@ -169,7 +160,6 @@ class VisionDSClient:
                 return r.json()
                 
         finally:
-            # 释放API KEY
             coordinator.release_api_key(key_stats)
 
     def _headers(self, key: str):

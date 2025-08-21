@@ -20,14 +20,12 @@ import os
 sys.path.append(os.path.dirname(os.path.abspath(__file__)))
 from professional_document_generator import ProfessionalDocumentGenerator
 
-# 创建FastAPI应用
 app = FastAPI(
     title="文档自动化 API",
     description="智能文档生成系统API",
     version="1.0.0"
 )
 
-# 添加CORS中间件
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["http://localhost:3000", "http://127.0.0.1:3000"],
@@ -36,16 +34,12 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# 任务状态存储
 task_storage: Dict[str, Dict] = {}
 
-# 存储生成请求的完整上下文，用于后续下载时使用
 generation_contexts: Dict[str, Dict] = {}
 
-# 专业文档生成器实例
 doc_generator = ProfessionalDocumentGenerator()
 
-# 数据模型
 class DocGenerationRequest(BaseModel):
     doc_type: str
     output_formats: List[str] = ["markdown", "docx"]
@@ -66,7 +60,6 @@ class TaskStatus(BaseModel):
     created_at: str
     updated_at: str
 
-# API端点
 @app.post("/api/doc-automation/generate", response_model=DocGenerationResponse)
 async def generate_document(
     request: DocGenerationRequest,
@@ -74,10 +67,8 @@ async def generate_document(
 ):
     """触发文档生成任务"""
     
-    # 生成唯一任务ID
     job_id = f"doc_{request.doc_type}_{uuid.uuid4().hex[:8]}"
     
-    # 初始化任务状态
     task_storage[job_id] = {
         "job_id": job_id,
         "status": "started",
@@ -89,7 +80,6 @@ async def generate_document(
         "request": request.dict()
     }
     
-    # 在后台执行文档生成
     background_tasks.add_task(process_document_generation, job_id, request)
     
     return DocGenerationResponse(
@@ -112,36 +102,30 @@ async def get_generation_status(job_id: str):
 async def download_document(document_id: str, format: str = "markdown"):
     """下载生成的文档"""
     
-    # 从document_id中提取job_id，用于查找存储的请求上下文
     job_id = None
     doc_type = "strategy"  # 默认类型
     
     if "_" in document_id:
         parts = document_id.split("_")
         if len(parts) >= 3:
-            # document_id 格式：doc_novel_abc123_markdown -> job_id: doc_novel_abc123
             job_id = "_".join(parts[:-1])  # 移除最后的format部分
             
-            # 处理复合类型名，例如: doc_prompt_experiment_abc123 -> prompt_experiment
             if len(parts) >= 4 and parts[1] in ["prompt", "performance", "ab"]:
                 doc_type = f"{parts[1]}_{parts[2]}"
             else:
                 doc_type = parts[1]  # 例如: doc_strategy_abc123 -> strategy
     
-    # 尝试从任务存储中获取完整的上下文
     context = {}
     if job_id and job_id in task_storage:
         stored_request = task_storage[job_id].get("request", {})
         context = stored_request.get("context", {})
         print(f"📋 找到存储的请求上下文: job_id={job_id}, doc_type={doc_type}")
         
-        # 如果有小说配置，打印详情用于调试
         if "novel_config" in context:
             novel_config = context["novel_config"]
             print(f"📖 小说配置: mode={novel_config.get('mode')}, target_length={novel_config.get('target_length')}, style={novel_config.get('style')}")
     else:
         print(f"⚠️  未找到存储的上下文，使用默认配置: job_id={job_id}")
-        # 构建默认上下文信息
         context = {
             "doc_type": doc_type,
             "user_context": {
@@ -151,12 +135,10 @@ async def download_document(document_id: str, format: str = "markdown"):
             }
         }
     
-    # 生成真实文档内容
     doc_content = generate_real_document(document_id, format, doc_type, context)
     
     from fastapi.responses import Response
     
-    # 设置适当的Content-Type
     content_type_map = {
         "markdown": "text/markdown",
         "docx": "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
@@ -186,7 +168,6 @@ async def health_check():
 async def list_documents(limit: int = 10):
     """列出已生成的文档"""
     
-    # 获取最近的任务
     recent_tasks = list(task_storage.values())[-limit:]
     
     documents = []
@@ -196,32 +177,25 @@ async def list_documents(limit: int = 10):
     
     return {"documents": documents}
 
-# 后台任务处理
 async def process_document_generation(job_id: str, request: DocGenerationRequest):
     """处理文档生成任务"""
     
     try:
-        # 更新状态：处理中
         update_task_status(job_id, "processing", 10, "开始数据收集...")
         await asyncio.sleep(2)
         
-        # 模拟RAG数据收集
         update_task_status(job_id, "processing", 30, "收集审核数据...")
         await asyncio.sleep(3)
         
-        # 模拟知识库检索
         update_task_status(job_id, "processing", 50, "检索相关知识...")
         await asyncio.sleep(2)
         
-        # 模拟LLM生成
         update_task_status(job_id, "processing", 70, "AI内容生成中...")
         await asyncio.sleep(4)
         
-        # 模拟格式转换
         update_task_status(job_id, "processing", 90, "格式转换中...")
         await asyncio.sleep(2)
         
-        # 生成模拟文档
         documents = []
         for format_type in request.output_formats:
             doc_id = f"{job_id}_{format_type}"
@@ -235,12 +209,10 @@ async def process_document_generation(job_id: str, request: DocGenerationRequest
             }
             documents.append(document)
         
-        # 完成任务
         task_storage[job_id]["documents"] = documents
         update_task_status(job_id, "completed", 100, f"文档生成完成！共生成{len(documents)}个文件")
         
     except Exception as e:
-        # 任务失败
         update_task_status(job_id, "failed", 0, f"生成失败: {str(e)}")
         print(f"❌ 文档生成失败 {job_id}: {e}")
 
@@ -295,21 +267,17 @@ def generate_real_document(document_id: str, format_type: str, doc_type: str, co
     """生成真实文档内容"""
     
     try:
-        # DOCX 采用原生构建，返回字节
         if format_type == "docx":
             try:
                 return doc_generator.generate_document_docx(doc_type, context)
             except Exception as e:
                 print(f"⚠️ DOCX生成失败，回退为Markdown: {e}")
-                # 回退为markdown字节
                 real_content_fallback = doc_generator.generate_document(doc_type, context)
                 return real_content_fallback.encode('utf-8')
         
-        # 其他格式：先生成markdown
         real_content = doc_generator.generate_document(doc_type, context)
         
         if format_type == "html":
-            # 转换Markdown为HTML格式
             html_content = f"""<!DOCTYPE html>
 <html lang="zh-CN">
 <head>
@@ -380,28 +348,23 @@ def generate_real_document(document_id: str, format_type: str, doc_type: str, co
 </html>"""
             return html_content.encode('utf-8')
         else:
-            # 其他格式直接返回Markdown内容
             return real_content.encode('utf-8')
             
     except Exception as e:
-        # 如果生成失败，返回错误信息
         error_content = f"""# 文档生成错误
 
 **文档ID**: {document_id}  
 **格式**: {format_type}  
 **错误时间**: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}  
 
-## 错误信息
 {str(e)}
 
-## 建议
 请联系技术支持或稍后重试。
 
 ---
 *错误报告由系统自动生成*"""
         return error_content.encode('utf-8')
 
-# 启动服务器
 if __name__ == "__main__":
     print("🚀 启动文档自动化API服务器...")
     print("📍 服务地址: http://localhost:8000")

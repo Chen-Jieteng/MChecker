@@ -11,14 +11,12 @@ import dashscope
 from dashscope import Generation
 import logging
 
-# 配置日志
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
 app = Flask(__name__)
 CORS(app)  # 允许跨域请求
 
-# 设置DashScope API密钥
 dashscope.api_key = os.getenv('DASHSCOPE_API_KEY', 'sk-placeholder-replace-with-real-key')
 
 @app.route('/api/qwen-plus-reasoning', methods=['POST'])
@@ -37,7 +35,6 @@ def qwen_plus_reasoning():
         
         logger.info(f"🧠 qwen-plus推理请求: {prompt[:100]}...")
         
-        # 调用qwen-plus模型
         response = Generation.call(
             model='qwen-plus',
             prompt=prompt,

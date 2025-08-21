@@ -9,7 +9,6 @@ import os
 import sys
 from dotenv import load_dotenv
 
-# 加载环境变量
 load_dotenv()
 
 async def test_coordinator():
@@ -21,26 +20,22 @@ async def test_coordinator():
         from vision_api_coordinator import get_vision_coordinator, VisionApiCoordinator
         from dashscope_client import VisionDSClient
         
-        # 检查协调器初始化
         coordinator = get_vision_coordinator()
         
         if coordinator:
             print("✅ API协调器已启用")
             
-            # 显示状态
             status = coordinator.get_status()
             print(f"📊 协调器状态:")
             print(f"   总KEY数: {status['total_keys']}")
             print(f"   当前并发: {status['total_concurrent_requests']}")
             print(f"   可用槽位: {status['total_available_slots']}")
             
-            # 显示每个KEY的状态
             for i, key_status in enumerate(status['keys_status']):
                 print(f"   KEY{i+1}: {key_status['key_prefix']} "
                      f"并发{key_status['current_concurrent']}/{key_status['max_concurrent']} "
                      f"可用:{key_status['available']}")
             
-            # 测试KEY获取和释放
             print("\n🧪 测试KEY获取机制...")
             
             key_stats = await coordinator.acquire_api_key(timeout=5.0)
@@ -60,7 +55,6 @@ async def test_coordinator():
             print("   2. 环境变量格式错误")
             print("   3. API KEY为空")
             
-            # 检查环境变量配置
             vision_keys = os.getenv("DASHSCOPE_VISION_API_KEYS", "")
             general_keys = os.getenv("DASHSCOPE_API_KEYS", "")
             single_key = os.getenv("DASHSCOPE_API_KEY", "")
@@ -143,10 +137,8 @@ async def main():
     print("\n🎉 测试完成！")
 
 if __name__ == "__main__":
-    # 检查当前目录
     if not os.path.exists("vision_api_coordinator.py"):
         print("❌ 请在 agent_backend 目录下运行此脚本")
         sys.exit(1)
     
-    # 运行测试
     asyncio.run(main())

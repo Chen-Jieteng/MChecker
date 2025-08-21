@@ -67,17 +67,14 @@ class NovelOrchestrator:
         self.qwen_client = QwenClient()
         self.logger = logging.getLogger(__name__)
         
-        # 生成状态
         self.current_config: Optional[NovelConfig] = None
         self.current_progress: Optional[GenerationProgress] = None
         self.scene_tasks: List[SceneTask] = []
         self.generation_state = {}
         
-        # 质量控制参数
         self.quality_threshold = 7.0  # 1-10分，低于此分数需要重写
         self.max_revision_attempts = 3
         
-        # 桥接策略配置
         self.bridge_config = {
             "context_scenes": 2,  # 回溯多少个场景作为上下文
             "summary_length": 120,  # 摘要长度
@@ -89,7 +86,6 @@ class NovelOrchestrator:
         try:
             self.current_config = config
             
-            # 初始化进度
             self.current_progress = GenerationProgress(
                 current_chapter=0,
                 current_scene=0,
@@ -136,7 +132,6 @@ class NovelOrchestrator:
     async def _generate_from_scratch(self, progress_callback) -> str:
         """从零开始生成小说"""
         
-        # 第一阶段：规划
         await self._update_progress("planning", "生成整体大纲", progress_callback)
         outline = await self._generate_outline()
         
@@ -149,11 +144,9 @@ class NovelOrchestrator:
         await self._update_progress("planning", "规划场景任务", progress_callback)
         await self._plan_scene_tasks(outline)
         
-        # 第二阶段：写作
         await self._update_progress("writing", "开始章节写作", progress_callback)
         novel_content = await self._write_chapters(progress_callback)
         
-        # 第三阶段：后期处理
         await self._update_progress("reviewing", "生成目录和后记", progress_callback)
         final_content = await self._finalize_novel(novel_content)
         
@@ -198,7 +191,6 @@ class NovelOrchestrator:
         try:
             outline = json.loads(response.content)
             
-            # 创建情节线索
             plot_threads = []
             for i, conflict in enumerate(outline.get("main_conflicts", [])):
                 thread = PlotThread(
@@ -220,13 +212,11 @@ class NovelOrchestrator:
             return outline
             
         except json.JSONDecodeError:
-            # 如果JSON解析失败，创建基础大纲
             self.logger.warning("大纲JSON解析失败，使用基础大纲")
             return self._create_basic_outline()
     
     async def _create_character_bible(self):
         """创建角色圣经"""
-        # 从大纲中提取主要角色名
         main_characters = ["主角", "关键配角1", "关键配角2", "反派"]
         
         response = await asyncio.to_thread(
@@ -274,7 +264,6 @@ class NovelOrchestrator:
             try:
                 world_data = json.loads(response.content)
                 
-                # 提取不同类型的世界观元素
                 for element_type, elements in world_data.items():
                     if isinstance(elements, dict):
                         for name, details in elements.items():
@@ -301,7 +290,6 @@ class NovelOrchestrator:
             chapter_title = chapter.get("title", f"第{chapter_idx}章")
             chapter_events = chapter.get("key_events", [])
             
-            # 将章节分解为场景
             scenes_per_chapter = max(2, len(chapter_events))
             events_per_scene = max(1, len(chapter_events) // scenes_per_chapter)
             
@@ -326,14 +314,12 @@ class NovelOrchestrator:
         """写作所有章节"""
         novel_parts = []
         
-        # 添加标题和简介
         novel_parts.append(f"# {self.current_config.title}\n\n")
         novel_parts.append(f"> **生成时间**: {datetime.now().strftime('%Y年%m月%d日')}\n")
         novel_parts.append(f"> **字数目标**: {self.current_config.target_length:,}字\n")
         novel_parts.append(f"> **文学风格**: {self.current_config.style}\n\n")
         novel_parts.append("---\n\n")
         
-        # 按章节写作
         for chapter_num in range(1, self.current_config.chapters_target + 1):
             chapter_tasks = [task for task in self.scene_tasks if task.chapter == chapter_num]
             
@@ -346,7 +332,6 @@ class NovelOrchestrator:
             chapter_content = await self._write_chapter(chapter_num, chapter_tasks)
             novel_parts.append(chapter_content)
             
-            # 更新进度
             self.current_progress.current_chapter = chapter_num
             self.current_progress.words_written = len(''.join(novel_parts))
             
@@ -364,7 +349,6 @@ class NovelOrchestrator:
             chapter_parts.append(scene_content)
             chapter_parts.append("\n\n")
             
-            # 保存场景摘要
             summary = SceneSummary(
                 chapter=task.chapter,
                 scene=task.scene,
@@ -383,14 +367,12 @@ class NovelOrchestrator:
     
     async def _write_scene(self, task: SceneTask) -> str:
         """写作单个场景"""
-        # 构建上下文
         bridge_content = await self._build_bridge_context(task.chapter, task.scene)
         character_context = await self._build_character_context(task)
         world_context = await self._build_world_context(task)
         plot_context = await self._build_plot_context(task)
         style_guide = self._get_style_guide()
         
-        # 构建场景提示
         scene_prompt = f"""
 请写作第{task.chapter}章第{task.scene}个场景：{task.title}
 
@@ -406,7 +388,6 @@ class NovelOrchestrator:
 5. 语言生动，有画面感
 """
         
-        # 生成场景内容
         response = await asyncio.to_thread(
             self.qwen_client.generate_scene_content,
             scene_prompt,
@@ -423,13 +404,11 @@ class NovelOrchestrator:
         
         scene_content = response.content
         
-        # 质量检查和修订
         if len(scene_content) > 500:  # 只对足够长的内容进行质量检查
             revised_content = await self._review_and_revise(scene_content, task)
             if revised_content:
                 scene_content = revised_content
         
-        # 标记任务完成
         task.status = "completed"
         self.current_progress.current_scene = task.scene
         
@@ -440,7 +419,6 @@ class NovelOrchestrator:
         if current_chapter == 1 and current_scene == 1:
             return "这是小说的开篇场景，需要引人入胜地开始故事。"
         
-        # 获取前面的场景摘要
         related_scenes = self.memory.search_scenes(
             f"第{current_chapter}章", 
             top_k=self.bridge_config["context_scenes"]
@@ -458,7 +436,6 @@ class NovelOrchestrator:
     async def _build_character_context(self, task: SceneTask) -> str:
         """构建角色上下文"""
         if not task.characters_involved:
-            # 搜索相关角色
             characters = self.memory.search_characters(task.objective, top_k=3)
         else:
             characters = [(char, 1.0) for char in self.memory.search_characters(" ".join(task.characters_involved), top_k=3)]
@@ -542,7 +519,6 @@ class NovelOrchestrator:
             if overall_score >= self.quality_threshold:
                 return None  # 无需修改
             
-            # 如果有修改版本，返回修改版本
             revised_version = review_result.get("revised_version")
             if revised_version and len(revised_version) > len(content) * 0.5:
                 self.logger.info(f"场景质量评分{overall_score}，使用修改版本")
@@ -555,7 +531,6 @@ class NovelOrchestrator:
     
     async def _finalize_novel(self, novel_content: str) -> str:
         """完成小说最终处理"""
-        # 生成目录
         chapters = re.findall(r'^## 第(\d+)章.*$', novel_content, re.MULTILINE)
         
         toc_parts = ["## 目录\n\n"]
@@ -564,16 +539,13 @@ class NovelOrchestrator:
         
         toc = ''.join(toc_parts)
         
-        # 插入目录到简介后面
         intro_end = novel_content.find("---\n\n") + 5
         final_content = novel_content[:intro_end] + toc + "\n---\n\n" + novel_content[intro_end:]
         
-        # 添加后记
         stats = self.memory.get_novel_stats()
         epilogue = f"""
 ---
 
-## 后记
 
 《{self.current_config.title}》全文完。
 
@@ -607,7 +579,6 @@ class NovelOrchestrator:
     
     def _extract_summary(self, content: str) -> str:
         """提取内容摘要"""
-        # 简单的摘要提取：取前120字并清理格式
         clean_content = re.sub(r'[#*\-\n]+', ' ', content)
         clean_content = re.sub(r'\s+', ' ', clean_content).strip()
         return clean_content[:120] + "..." if len(clean_content) > 120 else clean_content
@@ -639,7 +610,6 @@ class NovelOrchestrator:
             if progress_callback:
                 await progress_callback(self.current_progress)
     
-    # 续写相关方法的简化实现
     async def _analyze_existing_content(self) -> Dict[str, Any]:
         """分析现有内容（简化版本）"""
         content = self.current_config.existing_content
@@ -653,7 +623,6 @@ class NovelOrchestrator:
     
     async def _extract_characters_and_world(self, analysis: Dict[str, Any]):
         """提取角色和世界观（简化版本）"""
-        # 创建基础角色
         main_char = Character(
             name="主角",
             description="故事的主人公",

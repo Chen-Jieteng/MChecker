@@ -35,10 +35,8 @@ async def generate_document(
 ):
     """触发文档生成任务"""
     
-    # 生成任务ID
     job_id = f"doc_gen_{request.doc_type}_{int(asyncio.get_event_loop().time())}"
     
-    # 构建 Dagster 作业配置
     run_config = {
         "ops": {
             "generate_documents": {
@@ -51,7 +49,6 @@ async def generate_document(
         }
     }
     
-    # 在后台执行 Dagster 作业
     background_tasks.add_task(run_dagster_job, run_config)
     
     return DocGenerationResponse(
@@ -79,7 +76,6 @@ async def health_check():
 @app.get("/api/doc-automation/docs")
 async def list_documents():
     """列出已生成的文档"""
-    # 这里应该扫描输出目录或查询数据库
     return {"documents": []}
 
 

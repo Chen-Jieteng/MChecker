@@ -12,7 +12,6 @@ from dataclasses import dataclass
 import dashscope
 from dashscope import Generation
 
-# 配置API
 dashscope.api_key = os.getenv('DASHSCOPE_API_KEY', 'sk-placeholder-replace-with-real-key')
 
 @dataclass
@@ -45,7 +44,6 @@ class QwenClient:
         self.max_context_length = 1000000  # 1M tokens
         self.logger = logging.getLogger(__name__)
         
-        # 针对小说生成的优化参数
         self.novel_config = {
             "temperature": 0.7,  # 保持创造性
             "top_p": 0.9,       # 高质量采样
@@ -56,10 +54,8 @@ class QwenClient:
     def generate_scene(self, request: GenerationRequest) -> GenerationResponse:
         """生成单个场景，专门优化的接口"""
         try:
-            # 构建请求参数
             messages = request.messages
             
-            # 确保不超过上下文限制
             total_tokens = self._estimate_tokens(messages)
             if total_tokens > self.max_context_length * 0.8:  # 留20%余量
                 self.logger.warning(f"上下文过长: {total_tokens} tokens，进行截断")
@@ -338,12 +334,10 @@ class QwenClient:
     def _estimate_tokens(self, messages: List[Dict[str, str]]) -> int:
         """估算token数量（粗略估计）"""
         total_chars = sum(len(msg.get("content", "")) for msg in messages)
-        # 中文大约1.5个字符 = 1个token，英文约4个字符 = 1个token
         return int(total_chars * 0.75)  # 保守估计
     
     def _truncate_messages(self, messages: List[Dict[str, str]], max_tokens: int) -> List[Dict[str, str]]:
         """截断消息以适应上下文限制"""
-        # 保留system消息和最后的user消息
         if len(messages) <= 2:
             return messages
         
@@ -351,17 +345,14 @@ class QwenClient:
         user_msg = messages[-1] if messages[-1].get("role") == "user" else None
         middle_msgs = messages[1:-1] if len(messages) > 2 else []
         
-        # 估算system和user消息的token数
         reserved_tokens = 0
         if system_msg:
             reserved_tokens += self._estimate_tokens([system_msg])
         if user_msg:
             reserved_tokens += self._estimate_tokens([user_msg])
         
-        # 为中间消息分配剩余token
         available_tokens = max_tokens - reserved_tokens
         
-        # 从最新的消息开始保留
         truncated_middle = []
         current_tokens = 0
         
@@ -373,7 +364,6 @@ class QwenClient:
             else:
                 break
         
-        # 重新组装消息
         result = []
         if system_msg:
             result.append(system_msg)

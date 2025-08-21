@@ -14,13 +14,11 @@ from enum import Enum
 from dataclasses import dataclass, field
 from datetime import datetime
 
-# 设置日志
 logging.basicConfig(level=logging.INFO, format='[%(asctime)s] %(levelname)s: %(message)s')
 logger = logging.getLogger("event_driven_agent")
 
 app = FastAPI(title="Event-Driven Agent Backend")
 
-# CORS中间件
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],
@@ -29,7 +27,6 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# ========== 事件驱动状态机 ==========
 
 class TaskType(Enum):
     VIDEO_ANALYSIS = "video_analysis"
@@ -63,10 +60,8 @@ class WorkflowSession:
     websocket: Optional[WebSocket] = None
     created_at: datetime = field(default_factory=datetime.now)
 
-# 全局状态存储
 workflow_sessions: Dict[str, WorkflowSession] = {}
 
-# ========== 事件发送器 ==========
 
 async def emit_event(session_id: str, event_type: str, data: Dict[Any, Any]):
     """向前端发送事件"""
@@ -84,7 +79,6 @@ async def emit_event(session_id: str, event_type: str, data: Dict[Any, Any]):
         except Exception as e:
             logger.error(f"❌ Failed to send event {event_type}: {e}")
 
-# ========== 任务管理器 ==========
 
 class TaskManager:
     @staticmethod
@@ -102,14 +96,12 @@ class TaskManager:
         if session:
             session.tasks[task_id] = task
             
-        # 发送任务开始事件
         await emit_event(session_id, 'task_started', {
             'task_id': task_id,
             'task_type': task_type.value,
             'status': task.status.value
         })
         
-        # 异步执行任务
         asyncio.create_task(TaskManager._execute_task(session_id, task_id, **kwargs))
         return task_id
     
@@ -125,7 +117,6 @@ class TaskManager:
             return
             
         try:
-            # 根据任务类型执行不同的分析
             if task.type == TaskType.VIDEO_ANALYSIS:
                 result = await TaskManager._execute_video_analysis(session_id, **kwargs)
             elif task.type == TaskType.AUDIO_ANALYSIS:
@@ -135,12 +126,10 @@ class TaskManager:
             else:
                 raise ValueError(f"Unknown task type: {task.type}")
             
-            # 任务完成
             task.status = TaskStatus.COMPLETED
             task.result = result
             task.completed_at = datetime.now()
             
-            # 发送完成事件
             await emit_event(session_id, 'task_completed', {
                 'task_id': task_id,
                 'task_type': task.type.value,
@@ -149,7 +138,6 @@ class TaskManager:
             })
             
         except Exception as e:
-            # 任务失败
             task.status = TaskStatus.FAILED
             task.error = str(e)
             task.completed_at = datetime.now()
@@ -167,7 +155,6 @@ class TaskManager:
         """执行视频分析"""
         aweme_id = kwargs.get('aweme_id')
         
-        # 模拟视频分析过程
         await emit_event(session_id, 'step_ready', {
             'step': 'video_extraction',
             'message': '正在提取视频帧...'
@@ -180,7 +167,6 @@ class TaskManager:
         })
         await asyncio.sleep(3)  # 模拟AI分析时间
         
-        # 返回模拟结果 - 包含帧数据
         frames = []
         for i in range(1, 13):
             frames.append({
@@ -250,7 +236,6 @@ class TaskManager:
             'summary': '评论整体积极向上'
         }
 
-# ========== 事件处理函数 ==========
 
 async def handle_start_workflow(session_id: str, data: Dict[Any, Any]):
     """处理工作流启动请求"""
@@ -261,9 +246,7 @@ async def handle_start_workflow(session_id: str, data: Dict[Any, Any]):
     
     logger.info(f"🚀 Starting workflow for video: {aweme_id}")
     
-    # 并行启动多个分析任务
     tasks = []
-    # 不再强制要求 aweme_id 才能启动任务
     tasks.append(TaskManager.start_task(session_id, TaskType.VIDEO_ANALYSIS, aweme_id=aweme_id))
     tasks.append(TaskManager.start_task(session_id, TaskType.AUDIO_ANALYSIS, aweme_id=aweme_id))
     
@@ -279,7 +262,6 @@ async def handle_agent_audit(session_id: str, data: Dict[Any, Any]):
     aweme_id = data.get('aweme_id')
     logger.info(f"🤖 Agent audit started for: {aweme_id}")
     
-    # 启动工作流
     await handle_start_workflow(session_id, data)
 
 async def handle_step_data_request(session_id: str, data: Dict[Any, Any]):
@@ -290,30 +272,24 @@ async def handle_step_data_request(session_id: str, data: Dict[Any, Any]):
     if not session:
         return
     
-    # 检查相关任务是否完成
     available_data = {}
     for task in session.tasks.values():
         if task.status == TaskStatus.COMPLETED and task.result:
             available_data[task.type.value] = task.result
     
-    # 发送可用数据
     await emit_event(session_id, 'step_data_ready', {
         'step_name': step_name,
         'available_data': available_data,
         'ready': len(available_data) > 0
     })
 
-# ========== Legacy消息处理 ==========
 
 async def handle_legacy_meta(session_id: str, data: Dict[Any, Any]):
     """处理legacy meta消息"""
     payload = data.get('data', {})
-    # 兼容顶层/嵌套两种结构
     aweme_id = data.get('aweme_id') or payload.get('aweme_id')
-    # 尝试从 src 中提取
     if not aweme_id:
         src = data.get('src') or payload.get('src') or ''
-        # 兼容 https://www.douyin.com/video/<id>
         try:
             import re
             m = re.search(r"/video/(\d+)", src)
@@ -322,7 +298,6 @@ async def handle_legacy_meta(session_id: str, data: Dict[Any, Any]):
         except Exception:
             pass
     
-    # 记录并启动工作流（即使 aweme_id 为空也启动，以保证视频/音频分析执行）
     session = workflow_sessions.get(session_id)
     if session:
         session.aweme_id = aweme_id
@@ -334,15 +309,12 @@ async def handle_legacy_meta(session_id: str, data: Dict[Any, Any]):
 
 async def handle_legacy_audio(session_id: str, data: Dict[Any, Any]):
     """处理legacy audio消息"""
-    # 音频数据处理 - 简化版本
     logger.debug(f"🎵 Audio data received for session: {session_id}")
 
 async def handle_legacy_frame(session_id: str, data: Dict[Any, Any]):
     """处理legacy frame消息"""
-    # 帧数据处理 - 简化版本
     logger.debug(f"📹 Frame data received for session: {session_id}")
 
-# ========== WebSocket端点 ==========
 
 @app.websocket("/ws/stream")
 async def ws_stream(ws: WebSocket):
@@ -350,14 +322,12 @@ async def ws_stream(ws: WebSocket):
     await ws.accept()
     session_id = str(uuid.uuid4())
     
-    # 创建工作流会话
     session = WorkflowSession(session_id=session_id, websocket=ws)
     workflow_sessions[session_id] = session
     
     try:
         logger.info(f"🔗 WebSocket connected: {session_id}")
         
-        # 发送初始化状态
         await emit_event(session_id, 'system_ready', {
             'ds_available': True,
             'public_url_set': True,
@@ -370,7 +340,6 @@ async def ws_stream(ws: WebSocket):
                 data = json.loads(msg)
                 logger.info(f"📨 Received WebSocket message: {data.get('type', 'unknown')} from {session_id}")
                 
-                # 处理事件驱动的消息
                 if data.get('type') == 'start_workflow':
                     logger.info(f"🚀 Processing start_workflow for session {session_id}")
                     await handle_start_workflow(session_id, data.get('data', {}))
@@ -378,7 +347,6 @@ async def ws_stream(ws: WebSocket):
                     await handle_agent_audit(session_id, data.get('data', {}))
                 elif data.get('type') == 'request_step_data':
                     await handle_step_data_request(session_id, data.get('data', {}))
-                # 处理legacy消息类型
                 elif data.get('type') == 'meta':
                     await handle_legacy_meta(session_id, data)
                 elif data.get('type') == 'audio':
@@ -386,7 +354,6 @@ async def ws_stream(ws: WebSocket):
                 elif data.get('type') == 'frame':
                     await handle_legacy_frame(session_id, data)
                 elif data.get('type') == 'frame_url':
-                    # 兼容仅发送帧 URL 的旧实现
                     await handle_legacy_frame(session_id, data)
                 else:
                     logger.debug(f"📨 Unhandled message type: {data.get('type')}")
@@ -400,11 +367,9 @@ async def ws_stream(ws: WebSocket):
     except Exception as e:
         logger.error(f"❌ WebSocket error: {e}")
     finally:
-        # 清理资源
         if session_id in workflow_sessions:
             del workflow_sessions[session_id]
 
-# ========== 兼容性API端点 ==========
 
 class AuditRequest(BaseModel):
     aweme_id: Optional[str] = None
@@ -422,7 +387,6 @@ async def agent_audit(request: AuditRequest):
     """智能体审核端点 - 兼容性接口"""
     logger.info(f"🤖 Agent audit requested for: {request.aweme_id}")
     
-    # 模拟分析结果 - 与事件驱动结果保持一致
     frames = []
     for i in range(1, 13):
         frames.append({
@@ -468,7 +432,6 @@ async def extract_frames(request: FrameExtractionRequest):
     """视频帧提取端点 - 兼容性接口"""
     logger.info(f"📹 Frame extraction requested for: {request.aweme_id}")
     
-    # 模拟帧提取结果
     frames = [
         {
             "index": i,
@@ -482,7 +445,6 @@ async def extract_frames(request: FrameExtractionRequest):
         for i in range(1, 13)
     ]
     
-    # 兼容前端期望的数据格式
     frame_urls = [frame["url"] for frame in frames]
     
     return {
@@ -496,17 +458,14 @@ async def extract_frames(request: FrameExtractionRequest):
 async def analyze_comments(request: CommentAnalysisRequest = None):
     """评论分析端点 - 兼容性接口"""
     try:
-        # 处理可能的空请求或不同格式的请求
         aweme_id = getattr(request, 'aweme_id', None) if request else None
         comments = getattr(request, 'comments', []) if request else []
         
-        # 确保comments是列表格式
         if not isinstance(comments, list):
             comments = []
         
         logger.info(f"💬 Comment analysis requested for: {aweme_id}, comments count: {len(comments)}")
         
-        # 如果comments为空，生成一些示例数据
         if not comments:
             comments = ["这个视频很棒！", "喜欢这个内容", "不错的分享", "有意思"]
         
@@ -555,7 +514,6 @@ async def get_reasoning_config():
         }
     }
 
-# ========== 健康检查 ==========
 
 @app.get("/health")
 async def health_check():

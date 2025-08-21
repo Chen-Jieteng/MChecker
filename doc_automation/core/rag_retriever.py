@@ -18,7 +18,6 @@ class RAGRetriever:
         """索引数据到知识库"""
         self.knowledge_base[source_name] = data
         
-        # 生成嵌入向量
         if isinstance(data, dict):
             text_content = self._extract_text_from_dict(data)
         else:
@@ -33,7 +32,6 @@ class RAGRetriever:
         """检索相关信息"""
         query_embedding = self.embedding_model.encode(query)
         
-        # 计算相似度
         similarities = {}
         for source_name, embedding in self.embeddings.items():
             similarity = np.dot(query_embedding, embedding) / (
@@ -41,7 +39,6 @@ class RAGRetriever:
             )
             similarities[source_name] = similarity
         
-        # 排序并返回最相关的内容
         sorted_sources = sorted(similarities.items(), key=lambda x: x[1], reverse=True)
         
         result_content = []
@@ -59,7 +56,6 @@ class RAGRetriever:
         if isinstance(data, list):
             return data
         elif isinstance(data, dict):
-            # 转换为列表格式
             return [data]
         else:
             return []

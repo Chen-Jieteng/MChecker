@@ -31,14 +31,11 @@ class ConfluencePublisher:
     def publish(self, document_path: str, page_config: Optional[Dict[str, Any]] = None) -> bool:
         """发布文档到Confluence"""
         try:
-            # 读取文档内容
             with open(document_path, 'r', encoding='utf-8') as f:
                 content = f.read()
             
-            # 解析文档元数据
             title, body = self._parse_document(content)
             
-            # 配置页面信息
             if page_config:
                 title = page_config.get('title', title)
                 parent_id = page_config.get('parent_id')
@@ -47,11 +44,9 @@ class ConfluencePublisher:
                 parent_id = None
                 space_key = self.space_key
             
-            # 检查页面是否已存在
             existing_page = self._find_page(title, space_key)
             
             if existing_page:
-                # 更新现有页面
                 page_id = existing_page['id']
                 result = self.confluence.update_page(
                     page_id=page_id,
@@ -59,7 +54,6 @@ class ConfluencePublisher:
                     body=self._convert_to_confluence_format(body)
                 )
             else:
-                # 创建新页面
                 result = self.confluence.create_page(
                     space=space_key,
                     title=title,
@@ -82,7 +76,6 @@ class ConfluencePublisher:
         """解析文档，提取标题和正文"""
         lines = content.split('\n')
         
-        # 查找第一个一级标题作为页面标题
         title = "Untitled Document"
         body_start_index = 0
         
@@ -97,16 +90,12 @@ class ConfluencePublisher:
     
     def _convert_to_confluence_format(self, markdown_content: str) -> str:
         """将Markdown内容转换为Confluence格式"""
-        # 这里可以使用markdown2confluence或其他转换工具
-        # 简单的转换示例
         content = markdown_content
         
-        # 转换标题
         content = content.replace('## ', 'h2. ')
         content = content.replace('### ', 'h3. ')
         content = content.replace('#### ', 'h4. ')
         
-        # 转换列表
         lines = content.split('\n')
         converted_lines = []
         
@@ -187,7 +176,6 @@ class ConfluencePublisher:
             return False
 
 
-# 使用示例配置
 CONFLUENCE_CONFIG = {
     'audit_reports': {
         'space_key': 'AUDIT',

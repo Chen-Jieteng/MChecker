@@ -91,11 +91,9 @@ class ExternalMemory:
         self.memory_dir = memory_dir
         os.makedirs(memory_dir, exist_ok=True)
         
-        # 初始化SQLite数据库
         self.db_path = os.path.join(memory_dir, "novel_memory.db")
         self._init_database()
         
-        # 初始化向量存储（失败则禁用检索，避免阻塞）
         self.embedding_model = None
         self.vector_dim = 1024  # bge-m3的向量维度
         try:
@@ -103,17 +101,14 @@ class ExternalMemory:
         except Exception as e:
             print(f"[ExternalMemory] 向量模型加载失败，将禁用检索: {e}")
         
-        # 向量索引
         self.scene_index = faiss.IndexFlatIP(self.vector_dim)  # 场景摘要向量
         self.character_index = faiss.IndexFlatIP(self.vector_dim)  # 角色描述向量
         self.world_index = faiss.IndexFlatIP(self.vector_dim)  # 世界观向量
         
-        # 向量到实体的映射
         self.scene_id_to_summary = {}
         self.character_id_to_card = {}
         self.world_id_to_element = {}
         
-        # 加载已存在的数据
         self._load_existing_data()
     
     def _init_database(self):
@@ -121,7 +116,6 @@ class ExternalMemory:
         conn = sqlite3.connect(self.db_path)
         cursor = conn.cursor()
         
-        # 角色表
         cursor.execute('''
             CREATE TABLE IF NOT EXISTS characters (
                 name TEXT PRIMARY KEY,
@@ -131,7 +125,6 @@ class ExternalMemory:
             )
         ''')
         
-        # 世界观表
         cursor.execute('''
             CREATE TABLE IF NOT EXISTS world_elements (
                 name TEXT PRIMARY KEY,
@@ -142,7 +135,6 @@ class ExternalMemory:
             )
         ''')
         
-        # 情节线索表
         cursor.execute('''
             CREATE TABLE IF NOT EXISTS plot_threads (
                 id TEXT PRIMARY KEY,
@@ -155,7 +147,6 @@ class ExternalMemory:
             )
         ''')
         
-        # 场景摘要表
         cursor.execute('''
             CREATE TABLE IF NOT EXISTS scene_summaries (
                 id TEXT PRIMARY KEY,
@@ -166,7 +157,6 @@ class ExternalMemory:
             )
         ''')
         
-        # 时间线表
         cursor.execute('''
             CREATE TABLE IF NOT EXISTS timeline_events (
                 id TEXT PRIMARY KEY,
@@ -186,40 +176,34 @@ class ExternalMemory:
         conn = sqlite3.connect(self.db_path)
         cursor = conn.cursor()
         
-        # 加载场景摘要
         cursor.execute("SELECT id, data FROM scene_summaries")
         for row in cursor.fetchall():
             summary_id, data_json = row
             summary = SceneSummary(**json.loads(data_json))
             self.scene_id_to_summary[summary_id] = summary
             
-            # 生成向量并添加到索引
             if self.embedding_model is not None:
                 text = f"{summary.title} {summary.summary}"
                 vector = self.embedding_model.encode([text])[0]
                 self.scene_index.add(np.array([vector], dtype=np.float32))
         
-        # 加载角色卡
         cursor.execute("SELECT name, data FROM characters")
         for row in cursor.fetchall():
             name, data_json = row
             character = Character(**json.loads(data_json))
             self.character_id_to_card[name] = character
             
-            # 生成向量
             if self.embedding_model is not None:
                 text = f"{character.name} {character.description} {character.personality}"
                 vector = self.embedding_model.encode([text])[0]
                 self.character_index.add(np.array([vector], dtype=np.float32))
         
-        # 加载世界观
         cursor.execute("SELECT name, data FROM world_elements")
         for row in cursor.fetchall():
             name, data_json = row
             element = WorldElement(**json.loads(data_json))
             self.world_id_to_element[name] = element
             
-            # 生成向量
             if self.embedding_model is not None:
                 text = f"{element.name} {element.description}"
                 vector = self.embedding_model.encode([text])[0]
@@ -241,7 +225,6 @@ class ExternalMemory:
         conn.commit()
         conn.close()
         
-        # 更新向量索引
         self.character_id_to_card[character.name] = character
         text = f"{character.name} {character.description} {character.personality}"
         vector = self.embedding_model.encode([text])[0]
@@ -261,7 +244,6 @@ class ExternalMemory:
         conn.commit()
         conn.close()
         
-        # 更新向量索引
         self.world_id_to_element[element.name] = element
         text = f"{element.name} {element.description}"
         vector = self.embedding_model.encode([text])[0]
@@ -297,7 +279,6 @@ class ExternalMemory:
         conn.commit()
         conn.close()
         
-        # 更新向量索引
         self.scene_id_to_summary[summary_id] = summary
         text = f"{summary.title} {summary.summary}"
         vector = self.embedding_model.encode([text])[0]
@@ -421,7 +402,6 @@ class ExternalMemory:
         conn = sqlite3.connect(self.db_path)
         cursor = conn.cursor()
         
-        # 统计各类数据
         cursor.execute("SELECT COUNT(*) FROM characters")
         char_count = cursor.fetchone()[0]
         

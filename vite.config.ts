@@ -21,7 +21,6 @@ export default defineConfig(async (): Promise<UserConfig> => {
   } catch {}
 
   return {
-    // point Vite root to douyin for assets and index.html
     root: 'douyin',
     base: './',
     envDir: 'env',

@@ -64,7 +64,6 @@ def rag_knowledge_base(
     """构建RAG知识库"""
     rag_retriever = RAGRetriever()
     
-    # 索引各类数据源
     rag_retriever.index_data("audit_metrics", audit_performance_metrics)
     rag_retriever.index_data("experiments", experiment_results)
     rag_retriever.index_data("policies", policy_configurations)
@@ -82,19 +81,15 @@ def generate_documents(context, rag_knowledge_base: RAGRetriever):
     config = context.op_config
     doc_type = config["doc_type"]
     
-    # 加载文档规格
     docspec_path = f"docspecs/{doc_type}.yaml"
     with open(docspec_path, 'r', encoding='utf-8') as f:
         docspec = yaml.safe_load(f)
     
-    # 生成文档
     generator = DocumentGenerator(rag_knowledge_base)
     
-    # 根据配置的输出格式生成多种格式
     for output_format in config["output_formats"]:
         document = generator.generate(docspec, output_format)
         
-        # 保存文档
         timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
         filename = f"{doc_type}_{timestamp}.{output_format}"
         output_path = f"output/{filename}"
@@ -146,7 +141,6 @@ def publish_to_docusaurus(context, document_path: str) -> bool:
 def send_notification(context, document_path: str) -> bool:
     """发送通知"""
     try:
-        # 这里可以集成邮件、钉钉、企微等通知渠道
         context.log.info(f"Notification sent for document: {document_path}")
         return True
     except Exception as e:
@@ -157,7 +151,6 @@ def send_notification(context, document_path: str) -> bool:
 @job
 def doc_generation_job():
     """文档生成作业流水线"""
-    # 构建知识库
     knowledge_base = rag_knowledge_base(
         audit_performance_metrics(),
         experiment_results(),
@@ -165,18 +158,14 @@ def doc_generation_job():
         user_feedback_data()
     )
     
-    # 动态生成文档
     documents = generate_documents(knowledge_base)
     
-    # 发布文档
     confluence_results = documents.map(publish_to_confluence)
     docusaurus_results = documents.map(publish_to_docusaurus)
     
-    # 发送通知
     notifications = documents.map(send_notification)
 
 
-# 资产组定义
 doc_generation_assets = [
     audit_performance_metrics,
     experiment_results,
@@ -186,7 +175,6 @@ doc_generation_assets = [
 ]
 
 
-# 预定义的文档生成作业
 @job(
     config={
         "ops": {

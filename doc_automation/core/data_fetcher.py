@@ -30,7 +30,6 @@ class DataFetcher:
                 ]
             }
         
-        # 这里应该连接实际的数据库或 API
         return {}
     
     def get_experiment_data(self) -> Dict[str, Any]:

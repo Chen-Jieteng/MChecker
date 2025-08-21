@@ -25,7 +25,6 @@ class ApiKeyStats:
     def can_accept_request(self) -> bool:
         """检查是否可以接受新请求"""
         now = time.time()
-        # 重置分钟统计
         if now - self.last_reset_time >= 60:
             self.requests_this_minute = 0
             self.last_reset_time = now
@@ -40,7 +39,6 @@ class ApiKeyStats:
     
     def try_acquire(self):
         """尝试原子获取请求许可 - 并发安全版本"""
-        # 原子操作：检查并获取
         if self.can_accept_request():
             self.current_concurrent += 1
             self.requests_this_minute += 1
@@ -76,7 +74,6 @@ class VisionApiCoordinator:
             for key in api_keys
         ]
         
-        # 🚀 移除全局锁，启用真正的并行处理
         
         logger.info(f"🔧 视觉API协调器初始化: {len(api_keys)}个KEY, 每KEY最大并发{max_concurrent_per_key}, 每分钟{max_per_minute_per_key}请求")
     
@@ -93,15 +90,11 @@ class VisionApiCoordinator:
         start_time = time.time()
         
         while time.time() - start_time < timeout:
-            # 🚀 移除全局锁，允许真正并行获取API KEY
-            # 寻找可用的KEY
             available_keys = [stat for stat in self.stats if stat.can_accept_request()]
             
             if available_keys:
-                # 选择当前并发数最少的KEY
                 chosen_key = min(available_keys, key=lambda x: x.current_concurrent)
                 
-                # 🎯 原子操作：尝试获取，如果失败则重试
                 if chosen_key.try_acquire():
                     logger.debug(f"🔑 并行获取API KEY: {chosen_key.key[:8]}*** "
                                f"(并发: {chosen_key.current_concurrent}/{chosen_key.max_concurrent}, "
@@ -109,7 +102,6 @@ class VisionApiCoordinator:
                     
                     return chosen_key
             
-            # 没有可用KEY或获取失败，等待一小段时间后重试
             await asyncio.sleep(0.1)
         
         logger.warning(f"⚠️ API KEY获取超时({timeout}s)，所有KEY都达到限制")
@@ -147,17 +139,14 @@ class VisionApiCoordinator:
             ]
         }
 
-# 全局协调器实例
 _vision_coordinator: Optional[VisionApiCoordinator] = None
 
 def init_vision_coordinator():
     """初始化视觉API协调器"""
     global _vision_coordinator
     
-    # 读取专用的视觉API KEY配置
     vision_keys_raw = os.getenv("DASHSCOPE_VISION_API_KEYS", "")
     if not vision_keys_raw:
-        # 回退到通用配置
         vision_keys_raw = os.getenv("DASHSCOPE_API_KEYS") or os.getenv("DASHSCOPE_API_KEY", "")
     
     vision_keys = [k.strip() for k in vision_keys_raw.split(',') if k.strip()]
@@ -166,7 +155,6 @@ def init_vision_coordinator():
         logger.warning("⚠️ 未配置视觉API KEY，将使用默认轮换机制")
         return
     
-    # 可以通过环境变量调整限制
     max_concurrent = int(os.getenv("VISION_API_MAX_CONCURRENT_PER_KEY", "5"))
     max_per_minute = int(os.getenv("VISION_API_MAX_PER_MINUTE_PER_KEY", "300"))
     
@@ -182,5 +170,4 @@ def get_vision_coordinator() -> Optional[VisionApiCoordinator]:
     """获取全局视觉API协调器"""
     return _vision_coordinator
 
-# 启动时自动初始化
 init_vision_coordinator()

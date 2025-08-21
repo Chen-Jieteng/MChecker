@@ -20,21 +20,17 @@ class DocusaurusPublisher:
         self.docs_path = os.path.join(self.site_path, 'docs')
         self.static_path = os.path.join(self.site_path, 'static')
         
-        # 确保目录存在
         os.makedirs(self.docs_path, exist_ok=True)
         os.makedirs(self.static_path, exist_ok=True)
     
     def publish(self, document_path: str, config: Optional[Dict[str, Any]] = None) -> bool:
         """发布文档到Docusaurus"""
         try:
-            # 读取文档内容
             with open(document_path, 'r', encoding='utf-8') as f:
                 content = f.read()
             
-            # 解析文档元数据
             frontmatter, body = self._parse_frontmatter(content)
             
-            # 应用配置
             if config:
                 frontmatter.update(config.get('frontmatter', {}))
                 category = config.get('category')
@@ -43,13 +39,11 @@ class DocusaurusPublisher:
                 category = frontmatter.get('category', 'general')
                 filename = None
             
-            # 生成文件名
             if not filename:
                 title = frontmatter.get('title', 'untitled')
                 timestamp = datetime.now().strftime('%Y-%m-%d')
                 filename = f"{timestamp}-{self._slugify(title)}.md"
             
-            # 确定目标路径
             if category:
                 target_dir = os.path.join(self.docs_path, category)
                 os.makedirs(target_dir, exist_ok=True)
@@ -57,16 +51,13 @@ class DocusaurusPublisher:
             else:
                 target_path = os.path.join(self.docs_path, filename)
             
-            # 生成完整内容
             full_content = self._generate_content_with_frontmatter(frontmatter, body)
             
-            # 写入文件
             with open(target_path, 'w', encoding='utf-8') as f:
                 f.write(full_content)
             
             print(f"Successfully published to Docusaurus: {target_path}")
             
-            # 更新侧边栏配置
             self._update_sidebar_config(category, filename, frontmatter)
             
             return True
@@ -87,7 +78,6 @@ class DocusaurusPublisher:
                 except yaml.YAMLError:
                     pass
         
-        # 如果没有frontmatter，从内容中提取标题
         lines = content.split('\n')
         title = "Untitled"
         body = content
@@ -107,14 +97,12 @@ class DocusaurusPublisher:
     
     def _generate_content_with_frontmatter(self, frontmatter: Dict[str, Any], body: str) -> str:
         """生成带frontmatter的完整内容"""
-        # 确保必要的字段
         if 'id' not in frontmatter:
             frontmatter['id'] = self._slugify(frontmatter.get('title', 'untitled'))
         
         if 'date' not in frontmatter:
             frontmatter['date'] = datetime.now().strftime('%Y-%m-%d')
         
-        # 生成YAML frontmatter
         yaml_content = yaml.dump(frontmatter, default_flow_style=False, allow_unicode=True)
         
         return f"---\n{yaml_content}---\n\n{body}"
@@ -132,11 +120,9 @@ class DocusaurusPublisher:
         try:
             sidebar_path = os.path.join(self.site_path, 'sidebars.js')
             
-            # 如果侧边栏配置不存在，创建基础配置
             if not os.path.exists(sidebar_path):
                 self._create_initial_sidebar_config(sidebar_path)
             
-            # 这里可以根据需要实现更复杂的侧边栏更新逻辑
             print(f"Sidebar updated for category: {category}")
             
         except Exception as e:
@@ -216,12 +202,10 @@ module.exports = {
             with open(index_path, 'w', encoding='utf-8') as f:
                 json.dump(category_config, f, indent=2, ensure_ascii=False)
             
-            # 创建介绍页面
             intro_content = f"""# {category_config['label']}
 
 {config.get('description', f'{category_config["label"]}相关文档。')}
 
-## 文档列表
 
 此分类包含以下类型的文档：
 
@@ -291,7 +275,6 @@ module.exports = {
             return False
 
 
-# 配置示例
 DOCUSAURUS_CONFIG = {
     'categories': {
         'strategy': {

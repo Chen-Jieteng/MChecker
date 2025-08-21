@@ -34,7 +34,6 @@ def create_directory_structure():
 def create_core_modules():
     """创建核心模块"""
     
-    # 文档生成器
     doc_generator_code = '''"""
 文档生成器核心模块
 基于 RAG 和 DocSpec 规范生成各类文档
@@ -60,22 +59,17 @@ class DocumentGenerator:
         doc_type = docspec['type']
         sections = docspec['sections']
         
-        # 构建文档内容
         content_parts = []
         
-        # 生成元数据头部
         metadata = self._generate_metadata(docspec['metadata'])
         content_parts.append(metadata)
         
-        # 生成各个章节
         for section in sections:
             section_content = self._generate_section(section)
             content_parts.append(section_content)
         
-        # 合并内容
         full_content = '\\n\\n'.join(content_parts)
         
-        # 根据输出格式转换
         if output_format == 'markdown':
             return full_content
         elif output_format == 'docx':
@@ -108,16 +102,12 @@ class DocumentGenerator:
         content = f"## {section_title}\\n\\n"
         
         if section_type == 'text':
-            # 生成文本内容
             content += self._generate_text_content(section)
         elif section_type == 'table':
-            # 生成表格
             content += self._generate_table_content(section)
         elif section_type == 'chart':
-            # 生成图表
             content += self._generate_chart_content(section)
         elif section_type == 'flowchart':
-            # 生成流程图
             content += self._generate_flowchart_content(section)
         
         return content
@@ -127,15 +117,12 @@ class DocumentGenerator:
         prompts = section.get('prompts', [])
         data_sources = section.get('data_sources', [])
         
-        # 使用 RAG 检索相关信息
         context = ""
         for data_source in data_sources:
             relevant_data = self.rag_retriever.retrieve(data_source, limit=5)
             context += f"\\n{relevant_data}"
         
-        # 基于上下文生成内容
         if prompts:
-            # 这里应该调用 LLM 生成内容
             generated_content = self._call_llm_for_generation(prompts[0], context)
             return generated_content
         
@@ -146,13 +133,11 @@ class DocumentGenerator:
         schema = section.get('table_schema', {})
         columns = schema.get('columns', [])
         
-        # 构建 Markdown 表格
         header = "| " + " | ".join([col['name'] for col in columns]) + " |"
         separator = "| " + " | ".join(['---'] * len(columns)) + " |"
         
         table_content = f"{header}\\n{separator}\\n"
         
-        # 获取数据并填充表格
         data_sources = section.get('data_sources', [])
         for data_source in data_sources:
             table_data = self.rag_retriever.get_structured_data(data_source)
@@ -167,7 +152,6 @@ class DocumentGenerator:
         chart_config = section.get('chart_config', {})
         chart_type = chart_config.get('type', 'bar')
         
-        # 生成图表描述和配置
         chart_description = f"### {chart_type.title()} 图表\\n\\n"
         chart_description += "```json\\n"
         chart_description += json.dumps(chart_config, indent=2, ensure_ascii=False)
@@ -186,25 +170,20 @@ class DocumentGenerator:
     
     def _call_llm_for_generation(self, prompt: str, context: str) -> str:
         """调用 LLM 生成内容"""
-        # 这里应该集成实际的 LLM API 调用
-        # 比如 DashScope、OpenAI 等
         return f"基于提示 '{prompt}' 和上下文生成的内容..."
     
     def _convert_to_docx(self, markdown_content: str) -> str:
         """转换为 DOCX 格式"""
-        # 使用 python-docx 或 pandoc 转换
         return f"[DOCX] {markdown_content}"
     
     def _convert_to_html(self, markdown_content: str) -> str:
         """转换为 HTML 格式"""
-        # 使用 markdown 库转换
         return f"<html><body>{markdown_content}</body></html>"
 '''
     
     with open('doc_automation/core/doc_generator.py', 'w', encoding='utf-8') as f:
         f.write(doc_generator_code)
     
-    # RAG 检索器
     rag_retriever_code = '''"""
 RAG 检索器模块
 支持多种高级检索策略
@@ -225,7 +204,6 @@ class RAGRetriever:
         """索引数据到知识库"""
         self.knowledge_base[source_name] = data
         
-        # 生成嵌入向量
         if isinstance(data, dict):
             text_content = self._extract_text_from_dict(data)
         else:
@@ -240,7 +218,6 @@ class RAGRetriever:
         """检索相关信息"""
         query_embedding = self.embedding_model.encode(query)
         
-        # 计算相似度
         similarities = {}
         for source_name, embedding in self.embeddings.items():
             similarity = np.dot(query_embedding, embedding) / (
@@ -248,7 +225,6 @@ class RAGRetriever:
             )
             similarities[source_name] = similarity
         
-        # 排序并返回最相关的内容
         sorted_sources = sorted(similarities.items(), key=lambda x: x[1], reverse=True)
         
         result_content = []
@@ -266,7 +242,6 @@ class RAGRetriever:
         if isinstance(data, list):
             return data
         elif isinstance(data, dict):
-            # 转换为列表格式
             return [data]
         else:
             return []
@@ -292,7 +267,6 @@ class RAGRetriever:
     with open('doc_automation/core/rag_retriever.py', 'w', encoding='utf-8') as f:
         f.write(rag_retriever_code)
     
-    # 数据获取器
     data_fetcher_code = '''"""
 数据获取器模块
 从各种数据源获取审核相关数据
@@ -325,7 +299,6 @@ class DataFetcher:
                 ]
             }
         
-        # 这里应该连接实际的数据库或 API
         return {}
     
     def get_experiment_data(self) -> Dict[str, Any]:
@@ -478,10 +451,8 @@ async def generate_document(
 ):
     """触发文档生成任务"""
     
-    # 生成任务ID
     job_id = f"doc_gen_{request.doc_type}_{int(asyncio.get_event_loop().time())}"
     
-    # 构建 Dagster 作业配置
     run_config = {
         "ops": {
             "generate_documents": {
@@ -494,7 +465,6 @@ async def generate_document(
         }
     }
     
-    # 在后台执行 Dagster 作业
     background_tasks.add_task(run_dagster_job, run_config)
     
     return DocGenerationResponse(
@@ -522,7 +492,6 @@ async def health_check():
 @app.get("/api/doc-automation/docs")
 async def list_documents():
     """列出已生成的文档"""
-    # 这里应该扫描输出目录或查询数据库
     return {"documents": []}
 
 
@@ -542,20 +511,16 @@ def create_start_script():
 
 echo "🚀 启动文档自动化系统..."
 
-# 检查 Python 依赖
 echo "📦 检查依赖..."
 pip install -r requirements.txt
 
-# 初始化 Dagster
 echo "⚙️ 初始化 Dagster..."
 export DAGSTER_HOME=$(pwd)/dagster_storage
 dagster instance migrate
 
-# 启动 Dagster UI (后台)
 echo "🎯 启动 Dagster UI..."
 nohup dagster dev --host 0.0.0.0 --port 3000 > dagster.log 2>&1 &
 
-# 启动 API 服务器 (后台)
 echo "🌐 启动 API 服务器..."
 nohup python -m doc_automation.api_server > api.log 2>&1 &
 
@@ -576,12 +541,10 @@ echo "停止服务: ./stop.sh"
         f.write(start_script)
     os.chmod('doc_automation/start.sh', 0o755)
     
-    # 创建停止脚本
     stop_script = '''#!/bin/bash
 
 echo "🛑 停止文档自动化系统..."
 
-# 停止所有相关进程
 pkill -f "dagster dev"
 pkill -f "api_server"
 

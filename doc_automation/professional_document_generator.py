@@ -153,7 +153,6 @@ class ProfessionalDocumentGenerator:
         timestamp = datetime.now()
         reviewer = context.get("user_context", {}).get("reviewer", "系统管理员")
         
-        # 文档头部信息
         doc_header = f"""内容审核策略文档
 
 文档编号：CS-{timestamp.strftime('%Y%m%d')}-001
@@ -163,7 +162,6 @@ class ProfessionalDocumentGenerator:
 适用范围：全平台内容审核业务
 文档密级：内部"""
 
-        # 一、审核目标与范围
         section1 = """
 一、审核目标与范围
 
@@ -175,25 +173,18 @@ class ProfessionalDocumentGenerator:
    （3）互动评论内容：用户评论、弹幕、私信等
    （4）推广营销内容：广告、软文、商业推广等"""
 
-        # 二、具体审核标准
         section2 = self._generate_audit_standards()
         
-        # 三、技术实现标准
         section3 = self._generate_technical_standards()
         
-        # 四、质量控制流程
         section4 = self._generate_quality_control()
         
-        # 五、数据分析与效果评估
         section5 = self._generate_data_analysis()
         
-        # 六、合规性要求
         section6 = self._generate_compliance_requirements()
         
-        # 七、持续改进机制
         section7 = self._generate_improvement_mechanism()
         
-        # 文档尾部
         doc_footer = f"""
 附录：
 1. 相关法律法规清单
@@ -211,7 +202,6 @@ class ProfessionalDocumentGenerator:
 
 本文档由智能文档生成系统基于RAG技术自动生成，经人工审核确认后发布。"""
 
-        # 组装完整文档
         full_document = f"""{doc_header}
 
 {section1}
@@ -393,7 +383,6 @@ class ProfessionalDocumentGenerator:
     def _generate_data_analysis(self) -> str:
         """生成数据分析与效果评估章节"""
         
-        # 生成近期数据统计
         total = self.audit_data["summary"]["total_videos"]
         approved = self.audit_data["summary"]["approved"] 
         rejected = self.audit_data["summary"]["rejected"]
@@ -561,7 +550,6 @@ class ProfessionalDocumentGenerator:
         from docx.shared import Pt, Cm  # type: ignore
         from docx.enum.text import WD_ALIGN_PARAGRAPH  # type: ignore
         
-        # 页面设置：A4纸，页边距
         sections = doc.sections
         for section in sections:
             section.page_height = Cm(29.7)  # A4高度
@@ -573,7 +561,6 @@ class ProfessionalDocumentGenerator:
             section.header_distance = Cm(1.5) # 页眉1.5cm
             section.footer_distance = Cm(1.75) # 页脚1.75cm
         
-        # 正文样式：宋体小四，首行缩进2字符，行距1.5倍
         normal_style = doc.styles['Normal']
         normal_style.font.name = '宋体'
         normal_style.font.size = Pt(12)  # 小四=12pt
@@ -582,7 +569,6 @@ class ProfessionalDocumentGenerator:
         normal_style.paragraph_format.space_before = Pt(3)  # 段前0.5行
         normal_style.paragraph_format.space_after = Pt(3)   # 段后0.5行
         
-        # 一级标题：黑体三号，加粗，居中
         if 'Heading 1' in doc.styles:
             h1_style = doc.styles['Heading 1']
         else:
@@ -594,7 +580,6 @@ class ProfessionalDocumentGenerator:
         h1_style.paragraph_format.space_before = Pt(12)  # 段前1行
         h1_style.paragraph_format.space_after = Pt(0)    # 段后0行
         
-        # 二级标题：黑体四号，加粗，左对齐
         if 'Heading 2' in doc.styles:
             h2_style = doc.styles['Heading 2']
         else:
@@ -606,7 +591,6 @@ class ProfessionalDocumentGenerator:
         h2_style.paragraph_format.space_before = Pt(6)   # 段前0.5行
         h2_style.paragraph_format.space_after = Pt(6)    # 段后0.5行
         
-        # 三级标题：宋体小四，加粗，左对齐
         if 'Heading 3' in doc.styles:
             h3_style = doc.styles['Heading 3']
         else:
@@ -618,7 +602,6 @@ class ProfessionalDocumentGenerator:
         h3_style.paragraph_format.space_before = Pt(6)   # 段前0.5行
         h3_style.paragraph_format.space_after = Pt(6)    # 段后0.5行
         
-        # 表格样式：宋体五号，居中
         if 'Table Normal' in doc.styles:
             table_style = doc.styles['Table Normal']
         else:
@@ -632,25 +615,20 @@ class ProfessionalDocumentGenerator:
         from docx.shared import Pt, Cm  # type: ignore
         from docx.enum.text import WD_ALIGN_PARAGRAPH  # type: ignore
         
-        # 获取第一个节
         section = doc.sections[0]
         
-        # 设置页眉
         header = section.header
         header_para = header.paragraphs[0]
         
-        # 页眉左侧：文档标题
         header_para.text = f"{doc_title}"
         header_para.style.font.name = '宋体'
         header_para.style.font.size = Pt(10.5)  # 五号
         header_para.alignment = WD_ALIGN_PARAGRAPH.LEFT
         
-        # 页眉右侧：版本号（添加tab和右对齐文本）
         from docx.shared import RGBColor  # type: ignore
         header_para.add_run(f"\t{version}")
         header_para.paragraph_format.tab_stops.add_tab_stop(Cm(15))  # 添加tab位置
         
-        # 设置页脚
         footer = section.footer
         footer_para = footer.paragraphs[0]
         footer_para.text = "- 1 -"
@@ -671,12 +649,10 @@ class ProfessionalDocumentGenerator:
                 return self.generate_data_report_docx(context)
             if doc_type == "prd":
                 return self.generate_prd_document_docx(context)
-            # 其他类型暂时以纯文本方式导出到docx
             from docx import Document  # type: ignore
             from docx.shared import Pt  # type: ignore
             doc = Document()
             
-            # 应用统一格式设置
             self._setup_document_format(doc)
             md = self.generate_document(doc_type, context)
             for line in md.splitlines():
@@ -686,7 +662,6 @@ class ProfessionalDocumentGenerator:
             doc.save(buf)
             return buf.getvalue()
         except Exception as e:
-            # 回退为markdown字节
             return (self.generate_document(doc_type, context) + f"\n\n[docx导出失败: {e}]").encode("utf-8")
 
     def generate_ab_test_report_docx(self, context: Dict) -> bytes:
@@ -701,20 +676,15 @@ class ProfessionalDocumentGenerator:
         timestamp = datetime.now()
         reviewer = context.get("user_context", {}).get("reviewer", "算法工程师")
 
-        # 创建文档
         doc = Document()
         
-        # 应用统一格式设置
         self._setup_document_format(doc)
         
-        # 设置页眉页脚
         self._setup_page_header_footer(doc, "三模型联合A/B测试实验报告", f"AB-{timestamp.strftime('%Y%m%d')}-V1.0")
 
-        # 标题
         h = doc.add_heading("三模型联合A/B测试实验报告", level=1)
         h.alignment = WD_ALIGN_PARAGRAPH.CENTER
 
-        # 元信息
         meta = [
             ("文档编号", f"AB-{timestamp.strftime('%Y%m%d')}-001"),
             ("实验名称", "qvq-plus + qwen-audio-asr + qwq-plus-latest 三模型联合A/B测试"),
@@ -731,7 +701,6 @@ class ProfessionalDocumentGenerator:
 
         doc.add_paragraph()
 
-        # 一、实验背景与目标
         doc.add_heading("一、实验背景与目标", level=2)
         p = doc.add_paragraph("基于当前视频内容审核系统的多模态架构，我们同时对三个核心审核模型进行A/B测试：")
         p.paragraph_format.space_after = Pt(6)
@@ -743,16 +712,13 @@ class ProfessionalDocumentGenerator:
         for b in bullets:
             doc.add_paragraph(b, style=None).paragraph_format.left_indent = Inches(0.25)
 
-        # 目标假设
         doc.add_paragraph()
         doc.add_paragraph("主要目标：验证新一代模型在各自领域的性能提升效果，评估联合切换影响，并为全量上线提供依据。")
 
-        # 二、实验设计方案（简）
         doc.add_heading("二、实验设计方案", level=2)
         doc.add_paragraph("对照组（A组）- 当前生产模型组合：视觉qvq-plus、语音qwen-audio-asr、文本qwq-plus-latest。流量75%。")
         doc.add_paragraph("实验组（B组）- 测试模型组合：视觉Qwen-VL-Max、语音Paraformer-8k、文本Qwen2.5-Flash。流量25%。")
 
-        # 三、实验结果分析：分模型表格
         doc.add_heading("三、实验结果分析", level=2)
 
         def add_model_table(title: str, headers, rows):
@@ -768,7 +734,6 @@ class ProfessionalDocumentGenerator:
                 for j, cell_val in enumerate(r):
                     row_cells[j].text = str(cell_val)
 
-        # 视觉模型表
         add_model_table(
             "视觉识别模型A/B测试结果",
             ["指标名称", "A组(qvq-plus)", "B组(Qwen-VL-Max)", "改进幅度", "显著性"],
@@ -781,7 +746,6 @@ class ProfessionalDocumentGenerator:
             ],
         )
 
-        # 语音模型表
         add_model_table(
             "语音识别模型A/B测试结果",
             ["指标名称", "A组(qwen-audio-asr)", "B组(Paraformer-8k)", "改进幅度", "显著性"],
@@ -793,7 +757,6 @@ class ProfessionalDocumentGenerator:
             ],
         )
 
-        # 文本模型表
         add_model_table(
             "文本推理模型A/B测试结果",
             ["指标名称", "A组(qwq-plus-latest)", "B组(Qwen2.5-Flash)", "改进幅度", "显著性"],
@@ -805,7 +768,6 @@ class ProfessionalDocumentGenerator:
             ],
         )
 
-        # 严重程度分布表
         add_model_table(
             "违规内容严重程度分布对比",
             ["风险等级", "A组分布", "B组分布", "改进效果"],
@@ -817,12 +779,10 @@ class ProfessionalDocumentGenerator:
             ],
         )
 
-        # 结论与建议（简）
         doc.add_paragraph()
         doc.add_heading("四、结论与建议（摘要）", level=2)
         doc.add_paragraph("三个新模型在各自领域均显著优于现有模型，联合效果更佳，具备全量上线条件。建议分阶段提升流量并持续监控。")
 
-        # 输出内存字节
         buf = io.BytesIO()
         doc.save(buf)
         return buf.getvalue()
@@ -839,14 +799,12 @@ class ProfessionalDocumentGenerator:
         timestamp = datetime.now()
         reviewer = context.get("user_context", {}).get("reviewer", "算法工程师")
 
-        # 系统当前模型与指标（与前端保持一致，若context提供则覆盖）
         models = context.get("models", {
             "vision": {"name": "qvq-plus", "metrics": {"accuracy": 0.918, "latencyMs": 45, "mAP": 0.876}},
             "asr": {"name": "qwen-audio-asr", "metrics": {"accuracy": 0.941, "latencyMs": 180, "wer": 0.059}},
             "llm": {"name": "qwq-plus-latest", "metrics": {"accuracy": 0.894, "latencyMs": 320, "rougeL": 0.812}}
         })
 
-        # 系统提示词（若context提供prompts则使用）
         default_prompts = {
             "vision": "你是一个专业的视觉内容分析AI。请仔细分析上传的图像或视频帧内容，识别可能存在的以下风险类型：\n1. 暴力血腥内容\n2. 色情低俗内容\n3. 政治敏感内容\n4. 违法违规内容\n5. 未成年人安全\n6. 虚假信息\n输出格式：风险等级/问题描述/置信度/建议处理方式。",
             "asr": "你是一个专业的语音内容审核AI。请分析语音转录文本，识别仇恨言论、暴力威胁、色情低俗、政治敏感、违法内容、虚假信息、骚扰诽谤等风险，并输出风险等级/问题描述/置信度/处理建议。",
@@ -854,17 +812,13 @@ class ProfessionalDocumentGenerator:
         }
         prompts = context.get("prompts", default_prompts)
 
-        # 文档
         doc = Document()
         
-        # 应用统一格式设置
         self._setup_document_format(doc)
 
-        # 标题
         h = doc.add_heading("Prompt实验优化报告", level=1)
         h.alignment = WD_ALIGN_PARAGRAPH.CENTER
 
-        # 元信息表
         meta = [
             ("文档编号", f"PE-{timestamp.strftime('%Y%m%d')}-001"),
             ("实验名称", "内容审核模型Prompt策略优化实验"),
@@ -881,7 +835,6 @@ class ProfessionalDocumentGenerator:
 
         doc.add_paragraph()
 
-        # 当前系统模型与指标
         doc.add_heading("一、当前系统配置与指标", level=2)
         tbl = doc.add_table(rows=1, cols=5)
         tbl.alignment = WD_TABLE_ALIGNMENT.CENTER
@@ -895,7 +848,6 @@ class ProfessionalDocumentGenerator:
             except:
                 return str(v)
 
-        # 视觉
         vr = tbl.add_row().cells
         vr[0].text = "视觉识别"
         vr[1].text = models["vision"].get("name", "qvq-plus")
@@ -903,7 +855,6 @@ class ProfessionalDocumentGenerator:
         vr[3].text = f"{models['vision']['metrics'].get('latencyMs', '-') }ms"
         vr[4].text = f"mAP@0.5={models['vision']['metrics'].get('mAP', '-') }"
 
-        # 语音
         ar = tbl.add_row().cells
         ar[0].text = "语音识别"
         ar[1].text = models["asr"].get("name", "qwen-audio-asr")
@@ -911,7 +862,6 @@ class ProfessionalDocumentGenerator:
         ar[3].text = f"{models['asr']['metrics'].get('latencyMs', '-') }ms"
         ar[4].text = f"WER={models['asr']['metrics'].get('wer', '-') }"
 
-        # 文本
         lr = tbl.add_row().cells
         lr[0].text = "文本推理"
         lr[1].text = models["llm"].get("name", "qwq-plus-latest")
@@ -919,19 +869,16 @@ class ProfessionalDocumentGenerator:
         lr[3].text = f"{models['llm']['metrics'].get('latencyMs', '-') }ms"
         lr[4].text = f"ROUGE-L={models['llm']['metrics'].get('rougeL', '-') }"
 
-        # 提示词现状
         doc.add_paragraph()
         doc.add_heading("二、提示词现状（与系统一致）", level=2)
         for key, title in [("vision", "视觉分析提示词"), ("asr", "语音识别提示词"), ("llm", "文本推理提示词")]:
             doc.add_paragraph(title).runs[0].bold = True
             content = prompts.get(key, "")
             doc.add_paragraph(f"长度：{len(content)} 字符")
-            # 仅展示前300字符，避免文档过长
             preview = content[:300] + ("..." if len(content) > 300 else "")
             doc.add_paragraph(preview)
             doc.add_paragraph()
 
-        # 实验版本与总体对比（表格）
         doc.add_heading("三、实验设计与总体对比", level=2)
         t = doc.add_table(rows=1, cols=6)
         t.alignment = WD_TABLE_ALIGNMENT.CENTER
@@ -948,7 +895,6 @@ class ProfessionalDocumentGenerator:
             for j, v in enumerate(r):
                 rc[j].text = str(v)
 
-        # 结论
         doc.add_paragraph()
         doc.add_heading("四、结论与建议（摘要）", level=2)
         doc.add_paragraph("建议将V2.1多示例作为默认提示词；对高复杂度样本在LLM侧启用链式思考（V3.0）以提升解释性，与当前系统模型指标联动监控。")
@@ -971,14 +917,11 @@ class ProfessionalDocumentGenerator:
 
         doc = Document()
         
-        # 应用统一格式设置
         self._setup_document_format(doc)
 
-        # 标题
         title = doc.add_heading("内容安全智能审核系统性能分析报告", 0)
         title.alignment = WD_ALIGN_PARAGRAPH.CENTER
 
-        # 报告元信息表
         doc.add_heading("报告元信息", level=2)
         meta = [
             ("文档编号", f"PA-{timestamp.strftime('%Y%m%d')}-V3.2"),
@@ -995,25 +938,21 @@ class ProfessionalDocumentGenerator:
             table_meta.cell(i, 0).text = k
             table_meta.cell(i, 1).text = v
 
-        # 执行摘要
         doc.add_paragraph()
         doc.add_heading("执行摘要", level=2)
         summary = doc.add_paragraph()
         summary.add_run("本次性能分析针对六个核心AI模型（视觉、语音、文本）及其A/B测试版本进行了全面的性能基准测试。").bold = True
         doc.add_paragraph("通过精密的测试设计和数据分析，我们识别出了系统在高并发场景下的性能瓶颈，并提出了针对性的优化建议。")
 
-        # 关键发现
         findings = doc.add_paragraph()
         findings.add_run("关键发现：").bold = True
         doc.add_paragraph("• 视觉模型的GPU利用率在高并发时达到95%，成为主要瓶颈")
         doc.add_paragraph("• B组A/B测试模型在准确率和性能间取得了更好的平衡")
         doc.add_paragraph("• 系统在1500并发以下表现优异，超过3000并发需要扩容")
 
-        # 系统整体性能基线
         doc.add_heading("一、系统整体性能基线", level=2)
         doc.add_heading("端到端性能表现", level=3)
         
-        # 性能基线表格
         perf_table = doc.add_table(rows=1, cols=9)
         perf_table.alignment = WD_TABLE_ALIGNMENT.CENTER
         headers = ["并发数", "QPS峰值", "P50延迟", "P95延迟", "P99延迟", "错误率", "CPU使用率", "GPU使用率", "内存占用"]
@@ -1033,11 +972,9 @@ class ProfessionalDocumentGenerator:
             for j, cell_data in enumerate(row_data):
                 row.cells[j].text = cell_data
 
-        # AI模型性能对比
         doc.add_paragraph()
         doc.add_heading("二、六大AI模型性能详细分析", level=2)
         
-        # A组生产模型表格
         doc.add_heading("A组生产模型性能基准", level=3)
         
         def add_model_performance_table(title, model_data):
@@ -1055,7 +992,6 @@ class ProfessionalDocumentGenerator:
                 row.cells[2].text = note
             doc.add_paragraph()
 
-        # qvq-plus 视觉模型
         add_model_performance_table("qvq-plus 视觉识别模型 v3.2.1", [
             ("单次推理延迟", "45ms", "P95: 68ms, P99: 95ms"),
             ("批处理吞吐量", "220 req/s", "batch_size=8时"),
@@ -1066,7 +1002,6 @@ class ProfessionalDocumentGenerator:
             ("冷启动时间", "3.2s", "模型加载时间"),
         ])
 
-        # qwen-audio-asr 语音模型
         add_model_performance_table("qwen-audio-asr 语音识别模型 v1.4.2", [
             ("单次推理延迟", "180ms", "1分钟音频处理"),
             ("批处理吞吐量", "135 req/s", "batch_size=4时"),
@@ -1077,7 +1012,6 @@ class ProfessionalDocumentGenerator:
             ("语言支持", "中英混合", "主要优化中文"),
         ])
 
-        # qwq-plus-latest 文本模型
         add_model_performance_table("qwq-plus-latest 文本推理模型 v2.0.8", [
             ("单次推理延迟", "320ms", "平均文本长度500字符"),
             ("批处理吞吐量", "185 req/s", "batch_size=16时"),
@@ -1088,10 +1022,8 @@ class ProfessionalDocumentGenerator:
             ("推理稳定性", "99.2%", "连续运行12h无异常"),
         ])
 
-        # B组A/B测试模型对比
         doc.add_heading("B组A/B测试模型性能基准及对比", level=3)
 
-        # A/B对比表格
         doc.add_heading("模型性能综合对比", level=4)
         comparison_table = doc.add_table(rows=1, cols=7)
         comparison_table.alignment = WD_TABLE_ALIGNMENT.CENTER
@@ -1113,11 +1045,9 @@ class ProfessionalDocumentGenerator:
             for j, cell_data in enumerate(row_data):
                 row.cells[j].text = cell_data
 
-        # 系统组件性能分析
         doc.add_paragraph()
         doc.add_heading("三、系统组件性能分析", level=2)
         
-        # API网关性能
         doc.add_heading("API网关层性能表现", level=3)
         gateway_data = [
             ("峰值吞吐量", "28,500 QPS", "4节点集群"),
@@ -1138,7 +1068,6 @@ class ProfessionalDocumentGenerator:
             row.cells[1].text = value
             row.cells[2].text = note
 
-        # 业务逻辑层性能
         doc.add_paragraph()
         doc.add_heading("业务逻辑层性能表现", level=3)
         business_data = [
@@ -1160,7 +1089,6 @@ class ProfessionalDocumentGenerator:
             row.cells[1].text = value
             row.cells[2].text = note
 
-        # 结论与建议
         doc.add_paragraph()
         doc.add_heading("四、结论与优化建议", level=2)
         
@@ -1176,7 +1104,6 @@ class ProfessionalDocumentGenerator:
         doc.add_paragraph("• 中期：部署B组模型到生产环境，实施模型量化")
         doc.add_paragraph("• 长期：引入边缘计算，实施分布式推理架构")
 
-        # 输出文档
         buf = io.BytesIO()
         doc.save(buf)
         return buf.getvalue()
@@ -1197,14 +1124,11 @@ class ProfessionalDocumentGenerator:
 
         doc = Document()
         
-        # 应用统一格式设置
         self._setup_document_format(doc)
 
-        # 标题
         title = doc.add_heading("内容安全智能审核系统数据分析周报", 0)
         title.alignment = WD_ALIGN_PARAGRAPH.CENTER
 
-        # 报告基本信息表
         doc.add_heading("报告基本信息", level=2)
         meta = [
             ("报告编号", f"DA-{timestamp.strftime('%Y%m%d')}-W{timestamp.isocalendar()[1]:02d}"),
@@ -1221,14 +1145,12 @@ class ProfessionalDocumentGenerator:
             table_meta.cell(i, 0).text = k
             table_meta.cell(i, 1).text = v
 
-        # 执行摘要
         doc.add_paragraph()
         doc.add_heading("执行摘要", level=2)
         summary = doc.add_paragraph()
         summary.add_run("本周内容安全智能审核系统运行稳定，六大AI模型协同工作表现优异。").bold = True
         doc.add_paragraph("通过对284万条内容的深度分析，我们发现系统在处理效率、准确性和资源利用率方面都有显著提升。")
 
-        # 关键发现
         findings = doc.add_paragraph()
         findings.add_run("关键发现：").bold = True
         doc.add_paragraph("• qvq-plus视觉模型准确率提升至94.2%，较上周提高1.8个百分点")
@@ -1236,11 +1158,9 @@ class ProfessionalDocumentGenerator:
         doc.add_paragraph("• 多模态协同：三模型联合审核的综合准确率达到96.8%，创历史新高")
         doc.add_paragraph("• 成本效益：通过智能调度，GPU利用率优化至88.5%，月成本预计节约18万元")
 
-        # 六大AI模型性能分析
         doc.add_heading("一、六大AI模型效能指标分析", level=2)
         doc.add_heading("生产模型组（A组）性能表现", level=3)
         
-        # qvq-plus 视觉模型表格
         doc.add_heading("qvq-plus 视觉识别模型 v3.2.1", level=4)
         vision_table = doc.add_table(rows=1, cols=4)
         vision_table.alignment = WD_TABLE_ALIGNMENT.CENTER
@@ -1262,7 +1182,6 @@ class ProfessionalDocumentGenerator:
             for j, cell_data in enumerate(row_data):
                 row.cells[j].text = cell_data
 
-        # A/B测试对比表格
         doc.add_paragraph()
         doc.add_heading("A/B测试模型组性能对比", level=3)
         
@@ -1286,11 +1205,9 @@ class ProfessionalDocumentGenerator:
             for j, cell_data in enumerate(row_data):
                 row.cells[j].text = cell_data
 
-        # 业务效能与KPI
         doc.add_paragraph()
         doc.add_heading("二、业务效能与KPI达成分析", level=2)
         
-        # KPI达成表格
         doc.add_heading("核心业务指标总览", level=3)
         kpi_table = doc.add_table(rows=1, cols=5)
         kpi_table.alignment = WD_TABLE_ALIGNMENT.CENTER
@@ -1311,7 +1228,6 @@ class ProfessionalDocumentGenerator:
             for j, cell_data in enumerate(row_data):
                 row.cells[j].text = cell_data
 
-        # 风险分布分析
         doc.add_paragraph()
         doc.add_heading("三、风险分布与威胁情报分析", level=2)
         
@@ -1333,7 +1249,6 @@ class ProfessionalDocumentGenerator:
             for j, cell_data in enumerate(row_data):
                 row.cells[j].text = cell_data
 
-        # 数据驱动的建议
         doc.add_paragraph()
         doc.add_heading("四、数据驱动的决策建议", level=2)
         
@@ -1349,14 +1264,12 @@ class ProfessionalDocumentGenerator:
         doc.add_paragraph("• 资源需求：GPU利用率预计达到92%，需要密切监控")
         doc.add_paragraph("• 应对策略：提前准备弹性扩容方案")
 
-        # 结论
         doc.add_paragraph()
         doc.add_heading("结论与展望", level=2)
         final_conclusion = doc.add_paragraph()
         final_conclusion.add_run("核心成就：").bold = True
         doc.add_paragraph("多模态AI系统准确率达到96.8%，创历史新高。A/B测试验证了新模型的优越性，为升级决策提供数据支撑。成本效益持续优化，ROI达到3.2:1。")
 
-        # 输出文档
         buf = io.BytesIO()
         doc.save(buf)
         return buf.getvalue()
@@ -1375,14 +1288,11 @@ class ProfessionalDocumentGenerator:
 
         doc = Document()
         
-        # 应用统一格式设置
         self._setup_document_format(doc)
 
-        # 标题
         title = doc.add_heading("智能内容安全审核系统 v4.0 产品需求文档（PRD）", 0)
         title.alignment = WD_ALIGN_PARAGRAPH.CENTER
 
-        # 文档信息表
         doc.add_heading("文档信息", level=2)
         meta = [
             ("文档编号", f"PRD-{timestamp.strftime('%Y%m%d')}-ICAS-V4.0"),
@@ -1400,7 +1310,6 @@ class ProfessionalDocumentGenerator:
             table_meta.cell(i, 0).text = k
             table_meta.cell(i, 1).text = v
 
-        # 1. 需求背景
         doc.add_paragraph()
         doc.add_heading("1. 需求背景", level=2)
         
@@ -1424,7 +1333,6 @@ class ProfessionalDocumentGenerator:
         doc.add_paragraph("3. 监管要求：新版《网络安全法》对内容安全提出更高要求，需要更精准的技术手段")
         doc.add_paragraph("4. 竞争优势：率先部署AI+人工混合审核模式，可在行业内建立技术壁垒")
 
-        # 2. 需求描述
         doc.add_paragraph()
         doc.add_heading("2. 需求描述", level=2)
         desc = doc.add_paragraph()
@@ -1432,7 +1340,6 @@ class ProfessionalDocumentGenerator:
         doc.add_paragraph("，通过六大AI模型（qvq-plus视觉模型、qwq-plus-latest文本模型、qwen-audio-asr语音模型及其对应A/B测试版本）的协同工作，实现对文本、图像、视频、音频等多模态内容的智能识别和分级处理。")
         doc.add_paragraph("系统将采用'AI先审+人工复核+智能路由'的三层架构，支持实时审核、批量处理、监督模式等多种工作模式，并提供完整的审核工作台、数据分析、A/B测试等配套功能，最终实现内容安全管理的自动化、智能化和精准化。")
 
-        # 3. 角色说明
         doc.add_paragraph()
         doc.add_heading("3. 角色说明", level=2)
         
@@ -1455,7 +1362,6 @@ class ProfessionalDocumentGenerator:
             for j, cell_data in enumerate(row_data):
                 row.cells[j].text = cell_data
 
-        # 4. 核心功能设计
         doc.add_paragraph()
         doc.add_heading("4. 核心功能设计", level=2)
 
@@ -1478,7 +1384,6 @@ class ProfessionalDocumentGenerator:
             for j, cell_data in enumerate(row_data):
                 row.cells[j].text = cell_data
 
-        # 5. 技术架构
         doc.add_paragraph()
         doc.add_heading("5. 技术架构", level=2)
         
@@ -1489,7 +1394,6 @@ class ProfessionalDocumentGenerator:
         doc.add_paragraph("• 数据层：实时计算、离线分析、多元存储")
         doc.add_paragraph("• 监控层：性能监控、业务监控、告警通知")
 
-        # 6. 效果预期
         doc.add_paragraph()
         doc.add_heading("6. 效果预期", level=2)
 
@@ -1512,7 +1416,6 @@ class ProfessionalDocumentGenerator:
             for j, cell_data in enumerate(row_data):
                 row.cells[j].text = cell_data
 
-        # 7. 数据指标
         doc.add_paragraph()
         doc.add_heading("7. 数据指标", level=2)
         
@@ -1523,7 +1426,6 @@ class ProfessionalDocumentGenerator:
         doc.add_paragraph("• 成本指标：人工审核成本节约、投资回报率（ROI）")
         doc.add_paragraph("• 用户体验：内部用户满意度、内容创作者满意度")
 
-        # 8. 风险控制
         doc.add_paragraph()
         doc.add_heading("8. 风险控制", level=2)
         
@@ -1532,7 +1434,6 @@ class ProfessionalDocumentGenerator:
         doc.add_paragraph("• 合规风险：与监管部门保持密切沟通，设计灵活的规则配置")
         doc.add_paragraph("• 运营风险：建立多地域容灾备份，确保服务连续性")
 
-        # 9. 项目计划
         doc.add_paragraph()
         doc.add_heading("9. 项目计划", level=2)
 
@@ -1555,14 +1456,12 @@ class ProfessionalDocumentGenerator:
             for j, cell_data in enumerate(row_data):
                 row.cells[j].text = cell_data
 
-        # 结论
         doc.add_paragraph()
         doc.add_heading("结论", level=2)
         conclusion = doc.add_paragraph()
         conclusion.add_run("本PRD文档详细阐述了智能内容安全审核系统v4.0的完整设计方案").bold = True
         doc.add_paragraph("，通过六大AI模型的协同工作和AI+人工混合审核模式，将显著提升平台内容安全管理的效率、准确性和智能化水平，为业务发展提供强有力的技术支撑。")
 
-        # 输出文档
         buf = io.BytesIO()
         doc.save(buf)
         return buf.getvalue()
@@ -1581,15 +1480,12 @@ class ProfessionalDocumentGenerator:
 **报告状态**：已完成  
 **密级标识**：内部
 
-## 一、实验背景与目标
 
-### （一）实验背景
 基于当前视频内容审核系统的多模态架构，我们同时对三个核心审核模型进行A/B测试：
 - **视觉识别模型**：qvq-plus (生产) vs Qwen-VL-Max v2.8.1 (测试)
 - **语音识别模型**：qwen-audio-asr (生产) vs Paraformer-realtime-8k v2.1.3 (测试)  
 - **文本推理模型**：qwq-plus-latest (生产) vs Qwen2.5-Flash v2.5.14 (测试)
 
-### （二）实验目标
 1. **主要目标**
    - 验证新一代模型在各自领域的性能提升效果
    - 评估三模型联合切换对整体审核效果的影响
@@ -1601,9 +1497,7 @@ class ProfessionalDocumentGenerator:
    - H3：文本模型ROUGE-L将从0.812提升到0.838以上
    - H4：整体审核延迟将降低≥10%
 
-## 二、实验设计方案
 
-### （一）实验组设置
 **对照组（A组）- 当前生产模型组合**
 - 视觉识别：qvq-plus (准确率91.8%, 延迟45ms)
 - 语音识别：qwen-audio-asr (准确率94.1%, WER 0.059)
@@ -1616,7 +1510,6 @@ class ProfessionalDocumentGenerator:
 - 文本推理：Qwen2.5-Flash v2.5.14 (预期准确率92.6%, ROUGE-L 0.838)
 - 流量分配：25%
 
-### （二）分模型流量分配策略
 **视觉模型分流**
 - A组(qvq-plus): 75% 流量
 - B组(Qwen-VL-Max): 25% 流量
@@ -1632,7 +1525,6 @@ class ProfessionalDocumentGenerator:
 - B组(Qwen2.5-Flash): 20% 流量
 - 关键指标：ROUGE-L, 文本分析准确率, 推理延迟, 文本风险识别数
 
-### （三）关键指标定义
 **视觉模型指标**
 - 目标检测准确率、mAP@0.5、推理延迟(ms)、检测对象数、违规片段数
 
@@ -1645,9 +1537,7 @@ class ProfessionalDocumentGenerator:
 **整体联合指标**
 - 多模态融合准确率、端到端延迟、综合风险评分、人工复审率
 
-## 三、实验执行过程
 
-### （一）实验准备阶段（{(timestamp - timedelta(days=16)).strftime('%m月%d日')} - {(timestamp - timedelta(days=14)).strftime('%m月%d日')}）
 **技术准备**
 - 完成三个新模型的并行部署和A/B流量配置
 - 建立分模型独立监控和联合效果评估机制
@@ -1658,7 +1548,6 @@ class ProfessionalDocumentGenerator:
 - 制定分模型质量监控标准和联合评估标准
 - 建立模型间协同问题的快速响应机制
 
-### （二）实验执行阶段（{(timestamp - timedelta(days=14)).strftime('%m月%d日')} - {timestamp.strftime('%m月%d日')}）
 **第一周（渐进式启动）**
 - 视觉模型：启动25%流量，监控目标检测效果
 - 语音模型：启动30%流量，监控WER和延迟
@@ -1670,9 +1559,7 @@ class ProfessionalDocumentGenerator:
 - 重点观察：多模态融合效果、端到端性能、异常case处理
 - 数据采集：累计有效样本量达到统计要求
 
-## 四、实验结果分析
 
-### （一）分模型性能对比
 
 **视觉识别模型A/B测试结果**
 
@@ -1717,13 +1604,11 @@ class ProfessionalDocumentGenerator:
 └──────────────────┴──────────────────────┴─────────────────────┴──────────┴──────────┘
 ```
 
-### （二）联合效果分析
 - **多模态融合准确率**：从89.7%提升到93.4%（+3.7pp）
 - **端到端处理延迟**：从545ms降低到485ms（-11.0%）
 - **综合风险评分覆盖率**：从78.3%提升到85.6%（+7.3pp）
 - **人工复审率**：从12.4%降低到8.9%（-28.2%）
 
-### （三）严重程度分布改进
 ```
 违规内容严重程度分布对比
 ┌────────────┬─────────┬─────────┬──────────┐
@@ -1736,27 +1621,21 @@ class ProfessionalDocumentGenerator:
 └────────────┴─────────┴─────────┴──────────┘
 ```
 
-## 五、统计显著性验证
 
-### （一）三模型独立假设检验
 - **视觉模型准确率检验**（Z检验，p<0.001）
 - **语音模型WER检验**（t检验，p<0.001）  
 - **文本模型ROUGE-L检验**（Wilcoxon检验，p<0.001）
 
-### （二）联合效果假设检验
 - **多模态融合准确率**：Z=5.83, p<0.001
 - **端到端延迟**：t=-7.42, p<0.001
 - **人工复审率**：Z=-4.21, p<0.001
 
-### （三）置信区间估计
 - 视觉准确率提升95%CI：[1.8%, 3.0%]
 - 语音WER降低95%CI：[0.021, 0.032] 
 - 文本ROUGE-L提升95%CI：[0.019, 0.033]
 - 联合准确率提升95%CI：[2.9%, 4.5%]
 
-## 六、业务影响评估
 
-### （一）效益分析
 **成本节约**
 - 视觉识别：减少误检，月节约人工成本1.8万元
 - 语音识别：提升转录质量，月节约复核成本1.2万元  
@@ -1768,7 +1647,6 @@ class ProfessionalDocumentGenerator:
 - 人工复审率降低28.2%，审核员工作负担显著减轻
 - 风险识别覆盖率提升7.3%，内容安全保障更强
 
-### （二）风险评估
 **技术风险**
 - 三模型联合部署复杂度增加，运维压力上升
 - 新模型资源消耗总体增加约12%，需要资源扩容
@@ -1779,9 +1657,7 @@ class ProfessionalDocumentGenerator:
 - 审核员需要适应三套新的模型辅助界面和决策流程
 - 监管环境变化可能对某个模型产生特定影响
 
-## 七、结论与建议
 
-### （一）实验结论
 **核心假设全部验证通过**
 - ✅ H1：视觉模型准确率提升2.4pp，超过预期
 - ✅ H2：语音模型WER降低45.8%，大幅超过预期  
@@ -1791,7 +1667,6 @@ class ProfessionalDocumentGenerator:
 **综合评价**
 三个新模型在各自领域均显著优于现有模型，联合效果更佳，具备全量上线条件。
 
-### （二）分阶段推广建议
 **第一阶段（1周内）**
 - 视觉模型：流量提升至50%，重点监控目标检测稳定性
 - 语音模型：流量提升至60%，重点监控WER一致性
@@ -1807,21 +1682,17 @@ class ProfessionalDocumentGenerator:
 - 建立新模型组合的持续优化迭代机制
 - 探索基于三模型融合的下一代审核架构
 
-## 八、附录
 
-### （一）实验数据详情
 - **视觉模型样本**：A组78,432个视频，B组26,144个视频
 - **语音模型样本**：A组65,780段音频，B组28,234段音频  
 - **文本模型样本**：A组89,653条文本，B组22,413条文本
 - **实验期间**：14天完整数据
 - **数据质量**：完整性99.8%，标注一致性96.4%
 
-### （二）技术实现细节
 - **分流算法**：三模型独立一致性哈希，保证用户体验稳定
 - **监控系统**：分模型实时监控 + 联合效果监控，1分钟级聚合
 - **回滚机制**：支持单模型回滚和三模型联合回滚，15秒内完成
 
-### （三）相关文档
 - 《三模型联合A/B测试技术方案》
 - 《qvq-plus + qwen-audio-asr + qwq-plus-latest架构设计》
 - 《多模态审核模型监控运维手册》
@@ -1877,19 +1748,15 @@ class ProfessionalDocumentGenerator:
 
 2. 结构化版本（V2.0）
 ```
-## 任务说明
 请作为专业的内容审核员，基于平台规则判断内容是否违规。
 
-## 审核标准
 - 暴力内容：包含血腥、暴力、伤害等内容
 - 色情内容：包含裸体、性暗示、成人内容等
 - 虚假信息：误导性宣传、虚假广告等
 - 违法内容：涉及赌博、毒品、诈骗等
 
-## 待审核内容
 {{content}}
 
-## 判断结果
 请给出判断并说明理由：
 - 结果：[违规/不违规]
 - 类型：[如果违规，说明违规类型]
@@ -1898,7 +1765,6 @@ class ProfessionalDocumentGenerator:
 
 3. 多示例版本（V2.1）
 ```
-## 审核示例
 示例1：
 内容："这款减肥药100%有效，一周瘦20斤"
 结果：违规
@@ -1910,7 +1776,6 @@ class ProfessionalDocumentGenerator:
 结果：不违规
 理由：正常的生活分享，无违规内容
 
-## 请按照上述标准判断
 内容：{{content}}
 结果：
 ```
@@ -2099,7 +1964,6 @@ class ProfessionalDocumentGenerator:
         
         return f"""内容安全智能审核系统性能分析报告
 
-## 报告元信息
 
 | 属性 | 值 |
 |------|------|
@@ -2111,7 +1975,6 @@ class ProfessionalDocumentGenerator:
 | 密级 | 内部机密 |
 | 状态 | 已完成 |
 
-## 执行摘要
 
 本次性能分析针对六个核心AI模型（视觉、语音、文本）及其A/B测试版本进行了全面的性能基准测试。通过精密的测试设计和数据分析，我们识别出了系统在高并发场景下的性能瓶颈，并提出了针对性的优化建议。
 
@@ -2122,9 +1985,7 @@ class ProfessionalDocumentGenerator:
 
 ---
 
-## 一、测试目标与范围
 
-### 1.1 核心目标
 
 1. **模型性能基准测试**：全面评估六个核心AI模型的性能表现
 2. **系统级性能分析**：识别系统架构的性能瓶颈和优化机会
@@ -2132,9 +1993,7 @@ class ProfessionalDocumentGenerator:
 4. **业务影响评估**：评估性能优化对业务指标的影响
 5. **资源效率优化**：指导资源配置和成本优化策略
 
-### 1.2 测试范围覆盖
 
-#### 模型层面（六个核心模型）
 
 **生产模型（A组）**
 - 视觉识别：`qvq-plus` v3.2.1
@@ -2146,22 +2005,17 @@ class ProfessionalDocumentGenerator:
 - 语音识别：`Whisper-Large-v3` v1.8.3
 - 文本推理：`Qwen2.5-Flash` v1.5.6
 
-#### 系统层面测试覆盖
 1. **API网关层**：路由性能、限流策略、认证时延、负载均衡
 2. **业务逗辑层**：审核流程性能、数据验证、业务规则引擎
 3. **AI推理层**：模型加载、推理延迟、并发处理、GPU利用率
 4. **数据存储层**：数据库操作、缓存策略、文件存储性能
 
-#### 端到端场景测试
 - **单模态审核**：纯文本、纯图像、纯音频审核链路
 - **多模态融合**：视频内容（视觉+语音）、图文混合审核
 - **复杂业务场景**：批量审核、实时流处理、紧急响应
 
-## 二、测试环境与方法论
 
-### 2.1 测试环境规格
 
-#### 硬件配置（产级环境同步）
 ```
 计算资源
 ├── CPU: 2 × Intel Xeon Platinum 8358 (64核128线程)
@@ -2176,7 +2030,6 @@ class ProfessionalDocumentGenerator:
 └── 缓存: 2TB Optane 持久内存
 ```
 
-#### 软件栈环境
 | 组件类型 | 产品版本 | 特定配置 |
 |------------|------------|------------|
 | OS | Ubuntu 22.04 LTS | 内核调优, NUMA绑定 |
@@ -2187,9 +2040,7 @@ class ProfessionalDocumentGenerator:
 | 监控系统 | Prometheus + Grafana + Jaeger | 全链路监控 |
 | AI框架 | PyTorch 2.0 + TensorRT 8.6 | 模型优化、量化加速 |
 
-### 2.2 测试方法论体系
 
-#### 压力测试策略
 ```
 负载模式设计
 ├── 梯度压力测试: 10 → 50 → 100 → 500 → 1000 → 2000 → 5000 并发
@@ -2204,7 +2055,6 @@ class ProfessionalDocumentGenerator:
 └── 性能分析: Grafana + 自建性能分析平台
 ```
 
-#### 核心监控指标体系
 **应用层指标**
 - 响应时间分布: P50, P90, P95, P99, P99.9
 - 吞吐量指标: QPS, TPS, 并发处理能力
@@ -2223,11 +2073,8 @@ class ProfessionalDocumentGenerator:
 - 准确性指标: 精确率, 召回率, F1-Score
 - 稳定性指标: 推理结果方差, 异常检测率
 
-## 三、性能测试结果深度分析
 
-### 3.1 系统整体性能基线
 
-#### 端到端性能表现
 | 并发数 | QPS峰值 | P50延迟 | P95延迟 | P99延迟 | 错误率 | CPU使用率 | GPU使用率 | 内存占用 |
 |--------|---------|---------|---------|---------|--------|-----------|-----------|----------|
 | 100 | 1,428 | 35ms | 68ms | 124ms | 0.02% | 45% | 62% | 28GB |
@@ -2241,9 +2088,7 @@ class ProfessionalDocumentGenerator:
 - **性能衰减点**: 1500-3000并发，延迟开始非线性增长
 - **系统饱和点**: 3000+并发，错误率快速上升，需紧急扩容
 
-### 3.2 六大AI模型性能详细分析
 
-#### A组生产模型性能基准
 
 **qvq-plus 视觉识别模型 v3.2.1**
 ```
@@ -2284,7 +2129,6 @@ GPU显存占用              15.2GB        单实例
 推理稳定性               99.2%         连续运行12h无异常
 ```
 
-#### B组A/B测试模型性能基准
 
 **Qwen-VL-Max 视觉识别模型 v2.8.1**
 ```
@@ -2325,16 +2169,13 @@ GPU显存占用              11.8GB        -22.4% ↗️
 推理稳定性               99.7%         +0.5pp ↗️
 ```
 
-### 3.3 系统组件性能分析
 
-#### API网关层性能表现
 - **峰值吞吐量**: 28,500 QPS (4节点集群)
 - **平均响应延迟**: 6ms (P95: 12ms)
 - **限流策略精度**: 99.94% (误杀率 < 0.06%)
 - **负载均衡效果**: 节点间负载方差 < 5%
 - **TLS握手延迟**: 1.2ms (优化后)
 
-#### 业务逻辑层性能表现  
 - **核心业务QPS**: 18,600 (审核决策生成)
 - **数据库连接池**: 400个连接, 85%平均使用率
 - **缓存系统表现**: Redis 96.8%命中率, 本地缓存 91.2%
@@ -2497,7 +2338,6 @@ GPU显存占用              11.8GB        -22.4% ↗️
         premise = novel_config.get("premise", "")
         existing_content = novel_config.get("existing_content", "")
         
-        # 根据风格设定写作风格和基础设定
         style_config = self._get_novel_style_config(style)
         
         if mode == "create":
@@ -2556,7 +2396,6 @@ GPU显存占用              11.8GB        -22.4% ↗️
     def _generate_novel_from_scratch(self, title: str, premise: str, target_length: int, style_config: Dict, timestamp) -> str:
         """从零开始创作小说"""
         
-        # 生成章节结构
         chapter_count = max(10, target_length // 8000)  # 平均每章8000字
         chapters = self._generate_chapter_outline(title, premise, chapter_count, style_config)
         
@@ -2570,23 +2409,19 @@ GPU显存占用              11.8GB        -22.4% ↗️
 
 ---
 
-## 作品简介
 
 {self._generate_novel_description(title, premise, style_config)}
 
 ---
 
-## 目录
 
 """
         
-        # 生成目录
         for i, chapter in enumerate(chapters, 1):
             novel_content += f"第{i}章 {chapter['title']}\n"
         
         novel_content += "\n---\n\n"
         
-        # 生成各章节内容
         current_length = len(novel_content)
         target_per_chapter = (target_length - current_length) // len(chapters)
         
@@ -2596,12 +2431,10 @@ GPU显存占用              11.8GB        -22.4% ↗️
             )
             novel_content += chapter_content + "\n\n"
             
-            # 每5章添加一个小结
             if i % 5 == 0 and i < len(chapters):
                 novel_content += f"### 阶段总结 ({i//5})\n\n"
                 novel_content += self._generate_stage_summary(chapters[:i], style_config) + "\n\n"
         
-        # 添加后记
         novel_content += self._generate_epilogue(title, style_config, len(novel_content))
         
         return novel_content
@@ -2609,17 +2442,14 @@ GPU显存占用              11.8GB        -22.4% ↗️
     def _continue_novel(self, existing_content: str, target_length: int, style_config: Dict, timestamp) -> str:
         """续写扩展现有小说"""
         
-        # 分析现有内容
         analysis = self._analyze_existing_content(existing_content, style_config)
         
-        # 计算需要生成的字数
         existing_length = len(existing_content)
         new_content_length = target_length - existing_length
         
         if new_content_length <= 0:
             return existing_content + "\n\n**续写说明**: 原内容已达到目标字数，无需续写。"
         
-        # 生成续写内容
         continuation = f"""
 
 ---
@@ -2630,7 +2460,6 @@ GPU显存占用              11.8GB        -22.4% ↗️
 
 """
         
-        # 根据分析结果生成后续章节
         continuation_chapters = self._generate_continuation_chapters(
             analysis, new_content_length, style_config
         )
@@ -2649,9 +2478,7 @@ GPU显存占用              11.8GB        -22.4% ↗️
         """生成章节大纲"""
         chapters = []
         
-        # 根据不同风格生成不同的故事结构
         if style_config.get("setting") == "修仙玄幻世界":
-            # 修仙小说的经典结构
             story_arcs = [
                 "初入修仙", "筑基炼气", "门派试炼", "秘境探险", "宗门大比",
                 "外出历练", "仇敌追杀", "机缘造化", "境界突破", "护宗大战",
@@ -2664,13 +2491,11 @@ GPU显存占用              11.8GB        -22.4% ↗️
                 "人生感悟", "新的征程"
             ]
         else:
-            # 通用结构
             story_arcs = [
                 "故事开端", "人物介绍", "冲突产生", "情节发展", "高潮迭起",
                 "危机处理", "转机出现", "问题解决", "结局铺垫", "圆满结束"
             ]
         
-        # 将故事弧分配到章节中
         chapters_per_arc = max(1, chapter_count // len(story_arcs))
         
         for i, arc in enumerate(story_arcs):
@@ -2693,18 +2518,14 @@ GPU显存占用              11.8GB        -22.4% ↗️
         
         content = f"## 第{chapter_num}章 {chapter['title']}\n\n"
         
-        # 根据目标长度生成多个段落
         paragraph_count = max(5, target_length // 800)  # 平均每段800字
         
         for i in range(paragraph_count):
             if i == 0:
-                # 开头段落
                 paragraph = self._generate_opening_paragraph(chapter, style_config)
             elif i == paragraph_count - 1:
-                # 结尾段落
                 paragraph = self._generate_closing_paragraph(chapter, style_config)
             else:
-                # 中间段落
                 paragraph = self._generate_middle_paragraph(chapter, style_config, i)
             
             content += paragraph + "\n\n"
@@ -2729,7 +2550,6 @@ GPU显存占用              11.8GB        -22.4% ↗️
         style_templates = templates.get(style_config["setting"], templates["现代都市"])
         template = style_templates[hash(chapter["title"]) % len(style_templates)]
         
-        # 填充模板变量
         variables = {
             "setting": style_config["setting_elements"][0],
             "protagonist": style_config["sample_names"][0],
@@ -2757,7 +2577,6 @@ GPU显存占用              11.8GB        -22.4% ↗️
     def _generate_middle_paragraph(self, chapter: Dict, style_config: Dict, paragraph_index: int) -> str:
         """生成章节中间段落"""
         
-        # 生成4-6句话的段落
         sentences = []
         sentence_count = 4 + (paragraph_index % 3)  # 4-6句
         
@@ -2834,17 +2653,14 @@ GPU显存占用              11.8GB        -22.4% ↗️
         """分析现有内容，为续写做准备"""
         lines = content.split('\n')
         
-        # 提取标题
         title = "续写小说"
         for line in lines[:10]:
             if line.startswith('#') and not line.startswith('##'):
                 title = line.replace('#', '').strip()
                 break
         
-        # 统计章节数
         chapter_count = len([line for line in lines if line.startswith('## 第') and '章' in line])
         
-        # 提取主角名字（简单的启发式方法）
         potential_names = style_config["sample_names"]
         protagonist = potential_names[0]  # 默认使用第一个
         
@@ -2891,7 +2707,6 @@ GPU显存占用              11.8GB        -22.4% ↗️
         return f"""
 ---
 
-## 后记
 
 《{title}》全文完。
 
@@ -2925,19 +2740,16 @@ GPU显存占用              11.8GB        -22.4% ↗️
     def generate_novel_advanced(self, context: Dict) -> str:
         """使用新的RAG系统生成10万字小说"""
         try:
-            # 导入新的小说生成器
             import asyncio
             import sys
             import os
             
-            # 添加当前目录到Python路径
             current_dir = os.path.dirname(os.path.abspath(__file__))
             if current_dir not in sys.path:
                 sys.path.append(current_dir)
             
             from novel_orchestrator import NovelOrchestrator, NovelConfig
             
-            # 提取小说配置
             novel_config = context.get("novel_config", {})
             
             config = NovelConfig(
@@ -2952,37 +2764,31 @@ GPU显存占用              11.8GB        -22.4% ↗️
                 words_per_scene=1500
             )
             
-            # 创建编排器
             orchestrator = NovelOrchestrator()
             
-            # 由于FastAPI环境限制，我们需要在新的事件循环中运行
             try:
                 loop = asyncio.get_event_loop()
             except RuntimeError:
                 loop = asyncio.new_event_loop()
                 asyncio.set_event_loop(loop)
             
-            # 简化版本的同步生成
             if config.mode == "create":
                 novel_content = self._generate_advanced_novel_sync(config)
             else:
                 novel_content = self._continue_advanced_novel_sync(config)
 
-            # 去重与后处理
             novel_content = self._postprocess_novel(novel_content)
 
             return novel_content
             
         except Exception as e:
             print(f"高级小说生成失败，回退到基础版本: {str(e)}")
-            # 回退到原来的generate_novel方法
             return self.generate_novel_fallback(context)
     
     def _generate_advanced_novel_sync(self, config: NovelConfig) -> str:
         """同步版本的高级小说生成"""
         timestamp = datetime.now()
         
-        # 生成小说结构
         novel_content = f"""# {config.title}
 
 > **作者**: RAG文档生成系统 (高级版)  
@@ -2994,23 +2800,19 @@ GPU显存占用              11.8GB        -22.4% ↗️
 
 ---
 
-## 技术说明
 
 本小说采用最新的RAG（检索增强生成）技术创作，使用了以下先进技术：
 
-### 🧠 **外部记忆系统**
 - **角色卡片**: 维护角色一致性，追踪性格发展
 - **世界观圣经**: 确保设定统一，规则自洽  
 - **情节线索**: 伏笔种植与回收，多线索并行
 - **场景摘要**: 向量检索，智能关联前文
 
-### 🚀 **分层生成策略**
 - **整体规划**: 大纲 → 章节 → 场景 → 段落
 - **桥接技术**: 原文桥 + 摘要桥 + 预告桥
 - **上下文控制**: 1M token 智能分配与截断
 - **质量保证**: 自检修订 + 多样式采样
 
-### 📊 **实时统计**
 - 目标字数: {config.target_length:,}字
 - 计划章节: {config.chapters_target}章
 - 每章字数: ~{config.words_per_chapter:,}字
@@ -3018,38 +2820,30 @@ GPU显存占用              11.8GB        -22.4% ↗️
 
 ---
 
-## 作品简介
 
 {self._generate_advanced_premise(config)}
 
 ---
 
-## 目录
 
 """
         
-        # 如果是续写模式，不生成技术信息和重复的章节目录
         if config.mode == "continue" and config.existing_content:
-            # 直接开始续写内容，保持原文风格
             pass
         else:
-            # 生成章节目录（仅新创作模式）
             for i in range(1, config.chapters_target + 1):
                 novel_content += f"第{i}章 {self._generate_chapter_title(i, config.style, config.existing_content)}\n"
             
             novel_content += "\n---\n\n"
         
-        # 生成章节内容
         total_words_written = 0
         for chapter_num in range(1, config.chapters_target + 1):
             chapter_content, chapter_words = self._generate_advanced_chapter(chapter_num, config)
             novel_content += chapter_content + "\n\n"
             total_words_written += chapter_words
             
-            # 每3章添加一个进度报告
             if chapter_num % 3 == 0:
                 progress_report = f"""
-### 📈 创作进度报告 (第{chapter_num}章完成)
 
 - **已完成章节**: {chapter_num}/{config.chapters_target}
 - **已写字数**: 约{total_words_written:,}字
@@ -3063,7 +2857,6 @@ GPU显存占用              11.8GB        -22.4% ↗️
 """
                 novel_content += progress_report
         
-        # 添加技术后记
         novel_content += self._generate_tech_epilogue(config, total_words_written)
 
         return self._postprocess_novel(novel_content)
@@ -3072,12 +2865,9 @@ GPU显存占用              11.8GB        -22.4% ↗️
         """同步版本的高级续写"""
         timestamp = datetime.now()
         
-        # 续写模式：不添加任何技术元信息
         continuation = ""
         
-        # 生成续写章节 - 使用正确的中文编号
         for i in range(1, config.chapters_target + 1):
-            # 续写模式优先使用无缝续写函数
             if "苕" in config.existing_content and "舒远蓉" in config.existing_content:
                 chapter_content = self._generate_seamless_continuation(config, i, config.existing_content)
             else:
@@ -3122,9 +2912,7 @@ GPU显存占用              11.8GB        -22.4% ↗️
     def _generate_chapter_title(self, chapter_num: int, style: str, existing_content: str = "") -> str:
         """生成章节标题，支持根据原文内容智能生成"""
         
-        # 如果有原文内容，分析并生成相应风格的标题
         if existing_content and "苕" in existing_content and "奶奶" in existing_content:
-            # 检测到《红苕地里的眼睛》风格的乡土文学
             rural_titles = [
                 "地窖深处", "苕种传承", "饥饿年轮", "婚嫁之路", "晒席匠家",
                 "粮本记忆", "黄葛树下", "月光如镰", "民兵巡逻", "陶罐秘密",
@@ -3132,7 +2920,6 @@ GPU显存占用              11.8GB        -22.4% ↗️
             ]
             return rural_titles[(chapter_num - 1) % len(rural_titles)]
         
-        # 标准风格模板
         style_titles = {
             "fantasy": [
                 "初入仙途", "筑基问道", "门派试炼", "秘境探宝", "宗门大比",
@@ -3165,25 +2952,18 @@ GPU显存占用              11.8GB        -22.4% ↗️
         
         content = f"## 第{chapter_num}章 {chapter_title}\n\n"
         
-        # 如果是续写模式且有原文，优先使用续写内容生成
         if config.mode == "continue" and config.existing_content:
             content += self._generate_continuation_content(config, chapter_num)
         else:
-            # 根据章节位置生成不同类型的内容
             if chapter_num == 1 and not is_continuation:
-                # 开篇章节
                 content += self._generate_opening_chapter(config)
             elif chapter_num <= 3:
-                # 设定展开章节
                 content += self._generate_setup_chapter(chapter_num, config)
             elif chapter_num <= config.chapters_target - 2:
-                # 发展章节
                 content += self._generate_development_chapter(chapter_num, config)
             else:
-                # 高潮和结局章节
                 content += self._generate_climax_chapter(chapter_num, config)
         
-        # 添加章节分隔
         content += "\n---\n"
         
         word_count = len(content)
@@ -3260,7 +3040,6 @@ GPU显存占用              11.8GB        -22.4% ↗️
 林星辰深吸一口气。人类与未知文明的第一次接触，即将开始。"""
         }
         
-        # 如果是续写模式且有原文，生成续写内容
         if config.mode == "continue" and config.existing_content:
             return self._generate_continuation_content(config, 1)
         
@@ -3269,12 +3048,10 @@ GPU显存占用              11.8GB        -22.4% ↗️
     def _generate_seamless_continuation(self, config: NovelConfig, chapter_num: int, existing_content: str) -> str:
         """智能无缝续写，分析原文结构并合理延续"""
         
-        # 分析原文最后一个章节编号
         import re
         chapter_matches = re.findall(r'[一二三四五六七八九十]+、', existing_content)
         if chapter_matches:
             last_chapter = chapter_matches[-1]
-            # 原文有一、二、三、四，所以续写从五开始
             num_to_chinese = {
                 1: '五', 2: '六', 3: '七', 4: '八', 5: '九', 
                 6: '十', 7: '十一', 8: '十二', 9: '十三', 10: '十四'
@@ -3282,7 +3059,6 @@ GPU显存占用              11.8GB        -22.4% ↗️
             
             next_chapter_chinese = num_to_chinese.get(chapter_num, f'第{chapter_num + 4}章')
             
-            # 基于原文风格的智能续写 - 完整版本
             continuation_chapters = {
                 1: f"""
 {next_chapter_chinese}、
@@ -3631,7 +3407,6 @@ GPU显存占用              11.8GB        -22.4% ↗️
             
             return continuation_chapters.get(chapter_num, self._generate_era_specific_content(chapter_num, config))
         
-        # 如果无法解析章节，返回默认续写
         return self._generate_rural_chapter_content(chapter_num, config)
     
     def _generate_era_specific_content(self, chapter_num: int, config: NovelConfig) -> str:
@@ -3658,18 +3433,12 @@ GPU显存占用              11.8GB        -22.4% ↗️
     def _generate_continuation_content(self, config: NovelConfig, chapter_num: int) -> str:
         """生成续写内容，基于原文风格和内容"""
         
-        # 分析原文，提取关键元素
         existing = config.existing_content
         
-        # 检测是否为《红苕地里的眼睛》风格
         if "苕" in existing and "奶奶" in existing and "舒远蓉" in existing:
-            # 乡土文学风格续写 - 根据原文情况智能续写
-            # 分析原文结构，决定续写方式
             if "一、" in existing and "二、" in existing:
-                # 原文已有章节结构，继续原有编号
                 return self._generate_seamless_continuation(config, chapter_num, existing)
             
-            # 标准章节续写内容
             chapter_contents = {
                 1: """
 地窖深处的湿气从墙缝渗出，混合着泥土和腐烂红薯的气味。舒远蓉蹲在最深处，手指抠着墙角的泥土，那里藏着一小撮珍贵的苕种。
@@ -4035,7 +3804,6 @@ GPU显存占用              11.8GB        -22.4% ↗️
             return chapter_contents.get(chapter_num, self._generate_rural_chapter_content(chapter_num, config))
             
         else:
-            # 其他类型的续写
             return f"""
 （第{chapter_num}章续写内容）
 
@@ -4114,18 +3882,15 @@ GPU显存占用              11.8GB        -22.4% ↗️
         return f"""
 ---
 
-## 🔬 技术后记
 
 《{config.title}》创作完成！
 
-### 📊 **生成统计**
 - **目标字数**: {config.target_length:,}字
 - **实际生成**: 约{actual_words:,}字符
 - **完成章节**: {config.chapters_target}章
 - **平均章节长度**: 约{actual_words // config.chapters_target:,}字符
 - **生成时间**: {datetime.now().strftime('%Y年%m月%d日 %H:%M')}
 
-### 🚀 **技术亮点**
 
 **1. RAG增强生成**
 - 利用外部知识库丰富故事内容
@@ -4148,14 +3913,12 @@ GPU显存占用              11.8GB        -22.4% ↗️
 - 多样式采样，选择最佳表达
 - 实时质量监控，确保稳定输出
 
-### 🎯 **创新点**
 
 - **突破长度限制**: 传统AI模型难以生成超长连贯文本，本系统通过RAG技术成功突破
 - **保持角色一致**: 通过外部记忆避免了长文本中常见的角色OOC问题  
 - **多线索管理**: 并行处理多条情节线，编织复杂而有序的故事结构
 - **风格统一**: 全文保持统一的{config.style}风格，语言表达高度一致
 
-### 🔮 **技术展望**
 
 本次实验证明了RAG技术在创意写作领域的巨大潜力：
 
@@ -4164,7 +3927,6 @@ GPU显存占用              11.8GB        -22.4% ↗️
 3. **个性化定制**: 根据用户喜好调整风格和内容
 4. **实时互动**: 支持读者参与的互动式小说创作
 
-### 📝 **使用说明**
 
 本小说展示了当前最先进的AI长文本生成技术，具有以下特点：
 
@@ -4180,7 +3942,6 @@ GPU显存占用              11.8GB        -22.4% ↗️
 
 *本作品由AI系统自动生成，展示了人工智能在创意写作领域的最新突破*
 
-### 🔗 **技术支持**
 - 模型: Qwen-plus-latest (1M上下文)
 - 技术栈: RAG + 外部记忆 + 向量检索
 - 框架: FastAPI + SQLite + FAISS + Sentence-Transformers
@@ -4194,12 +3955,9 @@ GPU显存占用              11.8GB        -22.4% ↗️
         try:
             content = self.generate_novel(context)
         except Exception:
-            # 最后兜底
             return self.generate_novel(context)
-        # 对回退结果做去重/清洗
         return self._postprocess_novel(content)
 
-    # ====== 文本后处理与去重 ======
     def _postprocess_novel(self, text: str) -> str:
         """基础去重与清洗：
         - 段落去重（全局指纹）
@@ -4222,13 +3980,10 @@ GPU显存占用              11.8GB        -22.4% ↗️
 
         for line in lines:
             n = norm(line)
-            # 避免连续多空行
             if not n and (not result or not result[-1].strip()):
                 continue
-            # 相邻折叠
             if last_norm == n and n:
                 continue
-            # 全局指纹（仅对非空段落）
             if n:
                 h = hashlib.md5(n.encode('utf-8')).hexdigest()
                 if h in seen:
@@ -4259,7 +4014,6 @@ GPU显存占用              11.8GB        -22.4% ↗️
         
         return f"""# 内容安全智能审核系统数据分析周报
 
-## 报告基本信息
 
 | 属性 | 值 |
 |------|------|
@@ -4273,7 +4027,6 @@ GPU显存占用              11.8GB        -22.4% ↗️
 
 ---
 
-## 执行摘要
 
 本周内容安全智能审核系统运行稳定，六大AI模型协同工作表现优异。通过对284万条内容的深度分析，我们发现系统在处理效率、准确性和资源利用率方面都有显著提升。
 
@@ -4283,11 +4036,8 @@ GPU显存占用              11.8GB        -22.4% ↗️
 - **多模态协同**：三模型联合审核的综合准确率达到96.8%，创历史新高
 - **成本效益**：通过智能调度，GPU利用率优化至88.5%，月成本预计节约18万元
 
-## 一、六大AI模型效能指标分析
 
-### 1.1 生产模型组（A组）性能表现
 
-#### qvq-plus 视觉识别模型 v3.2.1
 ```
 核心指标                本周数值      上周对比     月度趋势
 ────────────────────────────────────────────────
@@ -4304,7 +4054,6 @@ GPU显存占用              11.8GB        -22.4% ↗️
 - **场景覆盖**：新增支持3种特殊视觉场景，覆盖率提升至94.8%
 - **异常检测**：识别出12种新型视觉对抗样本，模型鲁棒性增强
 
-#### qwen-audio-asr 语音识别模型 v1.4.2
 ```
 核心指标                本周数值      上周对比     月度趋势
 ────────────────────────────────────────────────
@@ -4316,7 +4065,6 @@ WER错误率               4.2%          -0.6pp      ↗️ 持续优化
 多语言支持              15种语言      +2种        ↗️ 功能扩展
 ```
 
-#### qwq-plus-latest 文本推理模型 v2.0.8
 ```
 核心指标                本周数值      上周对比     月度趋势
 ────────────────────────────────────────────────
@@ -4328,9 +4076,7 @@ ROUGE-L评分             0.825         +0.013      ↗️ 质量改善
 多任务处理能力          97.2%         +1.8pp      ↗️ 能力增强
 ```
 
-### 1.2 A/B测试模型组（B组）性能对比
 
-#### 模型性能综合对比分析
 ```
 模型类别     指标对比                A组(生产)    B组(测试)    改进幅度    推荐度
 ─────────────────────────────────────────────────────────────────────
@@ -4352,11 +4098,8 @@ ROUGE-L评分             0.825         +0.013      ↗️ 质量改善
 2. **语音模型权衡**：准确率提升明显，但资源消耗增加，需评估成本效益
 3. **文本模型强烈推荐**：长文本处理能力质的飞跃，业务价值巨大
 
-## 二、业务效能与KPI达成分析
 
-### 2.1 核心业务指标总览
 
-#### 内容处理效能统计
 ```
 处理维度           本周数据        日均数据       环比变化      年度目标达成
 ──────────────────────────────────────────────────────────────
@@ -4368,7 +4111,6 @@ ROUGE-L评分             0.825         +0.013      ↗️ 质量改善
 平均处理时长       2.34秒          -              -0.18秒      <3秒 ✅
 ```
 
-#### 质量保障指标
 ```
 质量维度           本周表现        目标值         达成状态      改进趋势
 ──────────────────────────────────────────────────────────────
@@ -4380,25 +4122,19 @@ SLA达成率          98.9%           98%+           ✅ 超额      ↗️ +0.7
 客户满意度         94.6%           90%+           ✅ 优秀      ↗️ +2.1pp
 ```
 
-### 2.2 趋势分析与预测模型
 
-#### 处理量趋势分析（7天滑动平均）
 - **增长趋势**：日处理量呈稳定上升趋势，周增长率8.7%
 - **峰值预测**：基于回归模型，预计下周峰值将达到45万条/日
 - **容量规划**：当前系统容量充足，预计可支撑至50万条/日
 - **季节性特征**：识别出明显的工作日/周末处理模式
 
-#### 准确率变化趋势（28天移动窗口）
 - **持续改进**：准确率月环比提升2.3个百分点，改进速度加快
 - **稳定性增强**：准确率波动范围缩小至±0.5%，系统更加稳定  
 - **模型贡献**：新模型版本贡献了78%的准确率提升
 - **预测展望**：基于当前趋势，预计下周准确率可达97.2%
 
-## 三、风险分布与威胁情报分析
 
-### 3.1 风险等级分布详细分析
 
-#### 本周风险内容构成（总计177,149条）
 ```
 风险等级    检出数量      占比      环比变化    主要特征                处理策略
 ─────────────────────────────────────────────────────────────────────
@@ -4408,7 +4144,6 @@ SLA达成率          98.9%           98%+           ✅ 超额      ↗️ +0.7
 极高风险    1,576条       0.9%      +0.4%      违法内容、紧急处理      立即阻断+上报
 ```
 
-#### 违规类型Top10分析
 1. **不实信息传播**：23,456条 (+8.2%) - 需加强事实核查能力
 2. **暴力血腥内容**：18,923条 (+3.1%) - 视觉模型识别效果良好
 3. **色情低俗内容**：15,678条 (-2.4%) - 检测精度持续提升
@@ -4547,7 +4282,6 @@ SLA达成率          98.9%           98%+           ✅ 超额      ↗️ +0.7
         
         return f"""# 智能内容安全审核系统 v4.0 产品需求文档（PRD）
 
-## 文档信息
 
 | 属性 | 值 |
 |------|------|
@@ -4562,9 +4296,7 @@ SLA达成率          98.9%           98%+           ✅ 超额      ↗️ +0.7
 
 ---
 
-## 1. 需求背景
 
-### 1.1 业务现状分析
 
 当前内容安全形势日益严峻，平台每日需要处理超过500万条多模态内容（文本、图像、视频、音频），传统的人工审核模式已无法满足业务快速发展需求。现有系统存在以下痛点：
 
@@ -4573,7 +4305,6 @@ SLA达成率          98.9%           98%+           ✅ 超额      ↗️ +0.7
 - **准确性挑战**：人工审核准确率波动大（85%-92%），存在主观性差异和疲劳效应
 - **合规风险**：新兴违规内容形式层出不穷，传统规则无法及时覆盖，存在合规风险
 
-### 1.2 产品机会点
 
 基于AI技术的快速发展，特别是多模态大模型在内容理解方面的突破，我们有机会构建新一代智能内容安全审核系统：
 
@@ -4582,7 +4313,6 @@ SLA达成率          98.9%           98%+           ✅ 超额      ↗️ +0.7
 3. **监管要求**：新版《网络安全法》对内容安全提出更高要求，需要更精准的技术手段
 4. **竞争优势**：率先部署AI+人工混合审核模式，可在行业内建立技术壁垒
 
-### 1.3 预期效果
 
 通过本次系统升级，预期达到以下效果：
 - **效率提升**：整体审核效率提升300%，平均处理时间降至2.5秒/条
@@ -4767,11 +4497,9 @@ SLA达成率          98.9%           98%+           ✅ 超额      ↗️ +0.7
 
 本PRD基于充分的市场调研和技术评估，为系统开发提供明确的方向指引。"""
 
-# 使用示例
 if __name__ == "__main__":
     generator = ProfessionalDocumentGenerator()
     
-    # 测试策略文档生成
     context = {
         "doc_type": "strategy",
         "user_context": {
