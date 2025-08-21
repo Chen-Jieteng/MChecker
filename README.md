@@ -81,7 +81,7 @@ DASHSCOPE_API_KEYS=sk-key1,sk-key2,sk-key3  # 多key负载均衡
 
 ## 📊 系统架构
 
-![系统架构图](https://github.com/Chen-Jieteng/MChecker/blob/main/readme_images/%E4%B8%8B%E8%BD%BD.png)
+![系统架构图](readme_images/下载.png)
 
 
 
@@ -90,12 +90,12 @@ DASHSCOPE_API_KEYS=sk-key1,sk-key2,sk-key3  # 多key负载均衡
 ### 主控制台 - 四象限设计
 统一工作台集成四大核心功能区域：
 
-<img src="https://github.com/Chen-Jieteng/MChecker/blob/main/readme_images/%E9%A6%96%E9%A1%B5.png" width="80%">
+<img src="readme_images/首页.png" width="80%">
 
 ### 📱 内容展示区
 实时展示待审核的短视频内容和用户评论：
 
-<img src="https://github.com/Chen-Jieteng/MChecker/blob/main/readme_images/APP%E9%83%A8%E5%88%86.png" width="60%">
+<img src="readme_images/APP部分.png" width="60%">
 
 ### 📊 AI分析监控中心
 
@@ -111,7 +111,7 @@ DASHSCOPE_API_KEYS=sk-key1,sk-key2,sk-key3  # 多key负载均衡
 - 系统指标：FPS、延迟、吞吐量、GPU占用率
 - 质量评估：FPR、FNR、Cohen-K值、Matthews相关系数
 
-<img src="https://github.com/Chen-Jieteng/MChecker/blob/main/readme_images/%E6%9C%BA%E5%AE%A1%E7%9B%91%E6%8E%A7.png" width="100%">
+<img src="readme_images/机审监控.png" width="100%">
 
 ### 🧠 提示词工程管理
 
@@ -124,13 +124,13 @@ DASHSCOPE_API_KEYS=sk-key1,sk-key2,sk-key3  # 多key负载均衡
 - 实时推理日志和性能分析
 - 可调参数：执行步数(15)、频率(2s)、温度(0.3)、top_p(0.9)
 
-<img src="https://github.com/Chen-Jieteng/MChecker/blob/main/readme_images/%E6%8E%A8%E7%90%86%E8%BF%87%E7%A8%8B%E6%97%A5%E5%BF%97.png" width="80%">
+<img src="readme_images/推理过程日志.png" width="80%">
 
 ### 🏷️ 智能数据标注台
 
 高效的AI辅助标注工具，支持批量处理和质量控制：
 
-<img src="https://github.com/Chen-Jieteng/MChecker/blob/main/readme_images/%E6%95%B0%E6%8D%AE%E6%A0%87%E6%B3%A8.png" width="100%">
+<img src="readme_images/数据标注.png" width="100%">
 
 ### ✅ 人工审批决策中心
 
@@ -139,18 +139,18 @@ DASHSCOPE_API_KEYS=sk-key1,sk-key2,sk-key3  # 多key负载均衡
 - 人工复审和最终决策
 - 审批历史和决策追踪
 
-<img src="https://github.com/Chen-Jieteng/MChecker/blob/main/readme_images/%E4%BA%BA%E5%B7%A5%E5%AE%A1%E6%A0%B8.png" width="100%">
+<img src="readme_images/人工审核.png" width="100%">
 
 **审核结果展示**
 详细的审核报告和处理建议：
 
-<img src="https://github.com/Chen-Jieteng/MChecker/blob/main/readme_images/%E5%AE%A1%E6%A0%B8%E7%BB%93%E6%9E%9C.png" width="100%">
+<img src="readme_images/审核结果.png" width="100%">
 
 ### 📝 智能文档生成
 
 基于RAG技术的自动化文档生成系统：
 
-<img src="https://github.com/Chen-Jieteng/MChecker/blob/main/readme_images/%E6%99%BA%E8%83%BD%E6%96%87%E6%A1%A3%E7%94%9F%E6%88%90.png" width="80%">
+<img src="readme_images/智能文档生成.png" width="80%">
 
 
 
@@ -377,7 +377,6 @@ git push origin feature/your-feature
 
 ### ⭐ 如果这个项目对你有帮助，请给一个Star！
 
-[![Star History Chart](https://api.star-history.com/svg?repos=Chen-Jieteng/MChecker&type=Date)](https://star-history.com/#Chen-Jieteng/MChecker&Date)
 
 **让AI让内容审核更智能、更高效！** 🚀
 
