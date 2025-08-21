@@ -85,7 +85,11 @@ DASHSCOPE_API_KEYS=sk-key1,sk-key2,sk-key3  # 多key负载均衡
 
 完整展示从内容审核、AI分析、人工决策到结果输出的全流程操作：
 
-https://github.com/Chen-Jieteng/MChecker/assets/your-user-id/test1.mov
+<video width="100%" controls>
+  <source src="videos/test1.mov" type="video/quicktime">
+  <source src="videos/test1.mp4" type="video/mp4">
+  您的浏览器不支持视频播放，请点击<a href="videos/test1.mov">下载观看</a>
+</video>
 
 ##  系统架构
 
@@ -164,7 +168,11 @@ https://github.com/Chen-Jieteng/MChecker/assets/your-user-id/test1.mov
 
 展示智能文档生成的完整流程，从数据采集到最终文档输出：
 
-https://github.com/Chen-Jieteng/MChecker/assets/your-user-id/test2.mov
+<video width="80%" controls>
+  <source src="videos/test2.mov" type="video/quicktime">
+  <source src="videos/test2.mp4" type="video/mp4">
+  您的浏览器不支持视频播放，请点击<a href="videos/test2.mov">下载观看</a>
+</video>
 
 
 
