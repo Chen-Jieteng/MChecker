@@ -13,7 +13,6 @@
 - 其余部分（审核员控制面板、报告生成系统、后端服务器代码、MChecker智能体）为原创。
 
 
-
 项目可能会有业务及专业性上的偏差，作者属技术背景，业务能力仍然无限的上升潜力，若有错误请通过Issues指正，谢谢大家。
 
 ## 项目架构
@@ -40,7 +39,10 @@
 - 近7天的模型评估（准确率，精确度，F1值，召回率，AUC，微观AUC，宏观AUC，MAP@0.5, MAP@0.75, MAP@0.5:0.95, AVG-IOU，IOU-Threshold，FPS，时延，吞吐量，风险检测值，FPR，FNR，宏观F1，加权F1，Top1准确率，Top3准确率，Top5准确率，AVG-CONF，CONF-Threashold，平衡，Cohen-K值，Matthews-P值）
 <img src="https://github.com/Chen-Jieteng/MChecker/blob/main/readme_images/%E6%9C%BA%E5%AE%A1%E7%9B%91%E6%8E%A7.png" width="100%">
 - 模型触发规则，包括视觉规则，语音规则，文本规则，编号，描述，权重值
-- 提示词配置
+- 提示词配置：
+  -- 视觉模型提示词：[提示词1](https://github.com/Chen-Jieteng/MChecker/blob/main/prompt/CV_prompt.md)
+  -- 文本模型提示词：[提示词2](https://github.com/Chen-Jieteng/MChecker/blob/main/prompt/NLP_prompt.md)
+  -- 语音模型提示词：[提示词3](https://github.com/Chen-Jieteng/MChecker/blob/main/prompt/speech_prompt.md)
 - 提示此版本管理和性能分析
 
 推理过程日志：
@@ -68,7 +70,9 @@
 
 
 ## 智能体模式
-监督处理，无监督处理
+- 单次测试：
+- 监督处理：
+- 无监督处理：
 
 
 ## 技术选型
