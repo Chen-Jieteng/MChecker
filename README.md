@@ -1,5 +1,6 @@
-# MChecker内容审核自动化项目
 <div align="center">
+    
+# MChecker内容审核自动化项目
 
 ![License](https://img.shields.io/badge/license-MIT-blue.svg)
 ![Python](https://img.shields.io/badge/python-3.8+-green.svg)
