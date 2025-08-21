@@ -85,11 +85,9 @@ DASHSCOPE_API_KEYS=sk-key1,sk-key2,sk-key3  # 多key负载均衡
 
 完整展示从内容审核、AI分析、人工决策到结果输出的全流程操作：
 
-<video width="100%" controls>
-  <source src="videos/test1.mov" type="video/quicktime">
-  <source src="videos/test1.mp4" type="video/mp4">
-  您的浏览器不支持视频播放，请点击<a href="videos/test1.mov">下载观看</a>
-</video>
+[![整体工作流演示](readme_images/首页.png)](videos/test1.mov)
+
+> 🎬 **点击上方图片观看完整演示视频** - 展示从内容上传、AI分析、监控面板到人工审核的完整流程
 
 ##  系统架构
 
@@ -168,11 +166,9 @@ DASHSCOPE_API_KEYS=sk-key1,sk-key2,sk-key3  # 多key负载均衡
 
 展示智能文档生成的完整流程，从数据采集到最终文档输出：
 
-<video width="80%" controls>
-  <source src="videos/test2.mov" type="video/quicktime">
-  <source src="videos/test2.mp4" type="video/mp4">
-  您的浏览器不支持视频播放，请点击<a href="videos/test2.mov">下载观看</a>
-</video>
+[![文档生成演示](readme_images/智能文档生成.png)](videos/test2.mov)
+
+> 📄 **点击上方图片观看文档生成演示** - 展示RAG技术驱动的智能文档自动化生成过程
 
 
 
