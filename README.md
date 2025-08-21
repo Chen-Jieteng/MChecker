@@ -79,6 +79,14 @@ DASHSCOPE_API_KEY=sk-your-api-key-here
 DASHSCOPE_API_KEYS=sk-key1,sk-key2,sk-key3  # 多key负载均衡
 ```
 
+##  完整系统演示
+
+**整体工作流演示视频**
+
+完整展示从内容审核、AI分析、人工决策到结果输出的全流程操作：
+
+https://github.com/Chen-Jieteng/MChecker/assets/your-user-id/test1.mov
+
 ##  系统架构
 
 ![系统架构图](readme_images/下载.png)
@@ -151,6 +159,12 @@ DASHSCOPE_API_KEYS=sk-key1,sk-key2,sk-key3  # 多key负载均衡
 基于RAG技术的自动化文档生成系统：
 
 <img src="readme_images/智能文档生成.png" width="80%">
+
+**文档生成演示视频**
+
+展示智能文档生成的完整流程，从数据采集到最终文档输出：
+
+https://github.com/Chen-Jieteng/MChecker/assets/your-user-id/test2.mov
 
 
 
