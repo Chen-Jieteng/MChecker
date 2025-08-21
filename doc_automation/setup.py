@@ -28,7 +28,7 @@ def create_directory_structure():
     
     for directory in directories:
         os.makedirs(directory, exist_ok=True)
-        print(f"✅ 创建目录: {directory}")
+        print(f" 创建目录: {directory}")
 
 
 def create_core_modules():
@@ -212,7 +212,7 @@ class RAGRetriever:
         embedding = self.embedding_model.encode(text_content)
         self.embeddings[source_name] = embedding
         
-        print(f"✅ 已索引数据源: {source_name}")
+        print(f" 已索引数据源: {source_name}")
     
     def retrieve(self, query: str, limit: int = 5) -> str:
         """检索相关信息"""
@@ -379,7 +379,7 @@ class DataFetcher:
     with open('doc_automation/core/data_fetcher.py', 'w', encoding='utf-8') as f:
         f.write(data_fetcher_code)
     
-    print("✅ 核心模块创建完成")
+    print(" 核心模块创建完成")
 
 
 def create_dagster_config():
@@ -409,7 +409,7 @@ compute_logs:
     with open('doc_automation/workspace.yaml', 'w', encoding='utf-8') as f:
         f.write(dagster_yaml)
     
-    print("✅ Dagster 配置创建完成")
+    print(" Dagster 配置创建完成")
 
 
 def create_api_server():
@@ -478,9 +478,9 @@ async def run_dagster_job(run_config: Dict[str, Any]):
     """在后台运行 Dagster 作业"""
     try:
         result = execute_job_sync(doc_generation_job, run_config=run_config)
-        print(f"✅ Dagster 作业执行完成: {result.run_id}")
+        print(f" Dagster 作业执行完成: {result.run_id}")
     except Exception as e:
-        print(f"❌ Dagster 作业执行失败: {e}")
+        print(f" Dagster 作业执行失败: {e}")
 
 
 @app.get("/api/doc-automation/health")
@@ -502,33 +502,33 @@ if __name__ == "__main__":
     with open('doc_automation/api_server.py', 'w', encoding='utf-8') as f:
         f.write(api_code)
     
-    print("✅ API 服务器创建完成")
+    print(" API 服务器创建完成")
 
 
 def create_start_script():
     """创建启动脚本"""
     start_script = '''#!/bin/bash
 
-echo "🚀 启动文档自动化系统..."
+echo " 启动文档自动化系统..."
 
-echo "📦 检查依赖..."
+echo " 检查依赖..."
 pip install -r requirements.txt
 
-echo "⚙️ 初始化 Dagster..."
+echo " 初始化 Dagster..."
 export DAGSTER_HOME=$(pwd)/dagster_storage
 dagster instance migrate
 
-echo "🎯 启动 Dagster UI..."
+echo " 启动 Dagster UI..."
 nohup dagster dev --host 0.0.0.0 --port 3000 > dagster.log 2>&1 &
 
-echo "🌐 启动 API 服务器..."
+echo " 启动 API 服务器..."
 nohup python -m doc_automation.api_server > api.log 2>&1 &
 
-echo "✅ 系统启动完成！"
+echo " 系统启动完成！"
 echo ""
-echo "📊 Dagster UI: http://localhost:3000"
-echo "🔌 API 接口: http://localhost:8000"
-echo "📖 API 文档: http://localhost:8000/docs"
+echo " Dagster UI: http://localhost:3000"
+echo " API 接口: http://localhost:8000"
+echo " API 文档: http://localhost:8000/docs"
 echo ""
 echo "日志文件:"
 echo "  - Dagster: dagster.log"
@@ -543,24 +543,24 @@ echo "停止服务: ./stop.sh"
     
     stop_script = '''#!/bin/bash
 
-echo "🛑 停止文档自动化系统..."
+echo " 停止文档自动化系统..."
 
 pkill -f "dagster dev"
 pkill -f "api_server"
 
-echo "✅ 系统已停止"
+echo " 系统已停止"
 '''
     
     with open('doc_automation/stop.sh', 'w', encoding='utf-8') as f:
         f.write(stop_script)
     os.chmod('doc_automation/stop.sh', 0o755)
     
-    print("✅ 启动脚本创建完成")
+    print(" 启动脚本创建完成")
 
 
 def main():
     """主函数"""
-    print("🏗️ 开始设置文档自动化系统...")
+    print(" 开始设置文档自动化系统...")
     
     try:
         create_directory_structure()
@@ -569,18 +569,18 @@ def main():
         create_api_server()
         create_start_script()
         
-        print("\n🎉 文档自动化系统设置完成！")
+        print("\n 文档自动化系统设置完成！")
         print("\n下一步操作:")
         print("1. 安装依赖: pip install -r requirements.txt")
         print("2. 启动系统: ./doc_automation/start.sh")
         print("3. 访问 Dagster UI: http://localhost:3000")
         print("4. 测试 API: http://localhost:8000/docs")
-        print("\n🔗 前端集成:")
+        print("\n 前端集成:")
         print("- 在审核界面点击文档生成按钮")
         print("- 调用 POST /api/doc-automation/generate")
         
     except Exception as e:
-        print(f"❌ 设置失败: {e}")
+        print(f" 设置失败: {e}")
         sys.exit(1)
 
 

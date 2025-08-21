@@ -12,15 +12,15 @@ import asyncio
 
 try:
     os.environ['DASHSCOPE_VL_MODEL'] = 'qwen-vl-max'
-    print("🔧 已强制设置视觉模型: qwen-vl-max")
+    print(" 已强制设置视觉模型: qwen-vl-max")
     from dashscope_client import DSClient, VisionDSClient
     from vision_api_coordinator import get_vision_coordinator
     test_ds = DSClient()
     vision_ds = VisionDSClient()
-    print(f"✅ DSClient initialized successfully at startup")
-    print(f"✅ VisionDSClient initialized successfully")
+    print(f" DSClient initialized successfully at startup")
+    print(f" VisionDSClient initialized successfully")
 except Exception as e:
-    print(f"❌ DSClient initialization failed: {e}")
+    print(f" DSClient initialization failed: {e}")
     DSClient = None
     VisionDSClient = None
 
@@ -296,7 +296,7 @@ def _extract_frames(video_url: str, fps: int = 0, count: int = 30) -> List[str]:
                        "-reconnect", "1", "-reconnect_streamed", "1", "-reconnect_delay_max", "5",
                        "-timeout", "30000000",
                        "-i", video_url, "-vf", f"fps={target_fps}", "-vframes", str(count), outpat]
-                print(f"🎬 视频时长{video_duration:.1f}s，使用fps={target_fps:.3f}策略提取{count}帧")
+                print(f" 视频时长{video_duration:.1f}s，使用fps={target_fps:.3f}策略提取{count}帧")
             except:
                 cmd = ["ffmpeg", "-y", 
                        "-user_agent", "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36",
@@ -304,7 +304,7 @@ def _extract_frames(video_url: str, fps: int = 0, count: int = 30) -> List[str]:
                        "-reconnect", "1", "-reconnect_streamed", "1", "-reconnect_delay_max", "5",
                        "-timeout", "30000000",
                        "-i", video_url, "-vf", "fps=0.2", "-vframes", str(count), outpat]
-                print(f"🎬 使用回退策略fps=0.2提取{count}帧")
+                print(f" 使用回退策略fps=0.2提取{count}帧")
         else:
             cmd = ["ffmpeg", "-y", 
                    "-user_agent", "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36",
@@ -348,7 +348,7 @@ async def _asr(ds: DSClient, audio_url: Optional[str]) -> str:
 async def _send_trace(ws: WebSocket, role: str, text: str, stage: str, payload: Optional[Dict[str, Any]] = None, kind: Optional[str] = None):
     try:
         if hasattr(ws, 'client_state') and ws.client_state.value != 1:  # WebSocketState.CONNECTED = 1
-            print(f"⚠️ WebSocket连接已断开，跳过发送trace")
+            print(f" WebSocket连接已断开，跳过发送trace")
             return False
             
         data = {'role': role, 'text': text, 'stage': stage, 'ts': int(time.time() * 1000)}
@@ -359,7 +359,7 @@ async def _send_trace(ws: WebSocket, role: str, text: str, stage: str, payload: 
         await ws.send_text(json.dumps({'type': 'trace', 'data': data}, ensure_ascii=False))
         return True
     except Exception as e:
-        print(f"⚠️ WebSocket发送trace失败: {e}")
+        print(f" WebSocket发送trace失败: {e}")
         return False  # 不再抛出异常，避免程序崩溃
 
 
@@ -389,17 +389,17 @@ async def _vision_describe(ds: DSClient, buf: 'SessionBuf') -> Dict[str, Any]:
         
         if isinstance(frame_path, str) and frame_path.startswith('http://127.0.0.1:8799/static/'):
             local_path = frame_path.replace('http://127.0.0.1:8799/static/', 'agent_backend/static/')
-            logger.info(f"🖼️ 处理图片: {frame_path} -> {local_path}")
+            logger.info(f" 处理图片: {frame_path} -> {local_path}")
             try:
                 if os.path.exists(local_path):
                     with open(local_path, 'rb') as f:
                         img_data = base64.b64encode(f.read()).decode('utf-8')
                         img_inputs.append(f"data:image/jpeg;base64,{img_data}")
-                        logger.info(f"✅ 成功编码图片: {local_path} ({len(img_data)} chars)")
+                        logger.info(f" 成功编码图片: {local_path} ({len(img_data)} chars)")
                 else:
-                    logger.error(f"❌ 图片文件不存在: {local_path}")
+                    logger.error(f" 图片文件不存在: {local_path}")
             except Exception as e:
-                logger.error(f"❌ 图片编码失败 {local_path}: {e}")
+                logger.error(f" 图片编码失败 {local_path}: {e}")
                 continue
         elif isinstance(frame_path, str) and frame_path.startswith(('http://', 'https://')):
             img_inputs.append(frame_path)
@@ -413,10 +413,10 @@ async def _vision_describe(ds: DSClient, buf: 'SessionBuf') -> Dict[str, Any]:
                 continue
     
     if not img_inputs:
-        logger.warning(f"⚠️ 无可用图片输入: frames={len(buf.frames)}, current_frames={len(current_frames)}")
+        logger.warning(f" 无可用图片输入: frames={len(buf.frames)}, current_frames={len(current_frames)}")
         return {'text': '', 'segments': [], 'risk_segments': []}
     
-    logger.info(f"🎯 准备调用视觉模型: {len(img_inputs)}张图片")
+    logger.info(f" 准备调用视觉模型: {len(img_inputs)}张图片")
     
     enhanced_prompt = f"""
 分析这{len(img_inputs)}帧连续视频画面（时间窗口: {frame_timestamps[0]:.1f}s - {frame_timestamps[-1]:.1f}s）：
@@ -430,7 +430,7 @@ async def _vision_describe(ds: DSClient, buf: 'SessionBuf') -> Dict[str, Any]:
     """
     
     r_vl = await ds.qwen_vl(img_inputs, prompt=enhanced_prompt)
-    logger.info(f"✅ 视觉模型调用完成: 收到响应 {type(r_vl)}")
+    logger.info(f" 视觉模型调用完成: 收到响应 {type(r_vl)}")
     
     text = ''
     out = r_vl.get('output') if isinstance(r_vl, dict) else {}
@@ -438,7 +438,7 @@ async def _vision_describe(ds: DSClient, buf: 'SessionBuf') -> Dict[str, Any]:
     if isinstance(out, dict):
         if 'text' in out:
             text = out.get('text', '')
-            logger.info(f"✅ 使用直接text结构提取: {len(text)}字符")
+            logger.info(f" 使用直接text结构提取: {len(text)}字符")
         
         elif 'choices' in out:
             choices = out.get('choices', [])
@@ -447,11 +447,11 @@ async def _vision_describe(ds: DSClient, buf: 'SessionBuf') -> Dict[str, Any]:
                 content = msg.get('content', [])
                 if content and isinstance(content[0], dict):
                     text = content[0].get('text', '')
-                    logger.info(f"✅ 使用choices结构提取: {len(text)}字符")
+                    logger.info(f" 使用choices结构提取: {len(text)}字符")
     
     if not text:
         text = json.dumps(r_vl, ensure_ascii=False)[:500]
-        logger.warning(f"⚠️ 使用原始响应作为文本: {len(text)}字符")
+        logger.warning(f" 使用原始响应作为文本: {len(text)}字符")
     
     risk_segments = []
     segments_info = []
@@ -513,15 +513,15 @@ async def _analyze_single_segment(segment: Dict, video_duration: float, buf: 'Se
     import time
     try:
         start_time = time.time()
-        print(f"🎬 开始并行分析片段{segment_index}: {segment['start_time']:.1f}s-{segment['end_time']:.1f}s (时刻: {start_time:.3f})")
+        print(f" 开始并行分析片段{segment_index}: {segment['start_time']:.1f}s-{segment['end_time']:.1f}s (时刻: {start_time:.3f})")
         segment_summary = await _generate_time_based_segment_summary(
             {}, segment, video_duration, buf
         )
         end_time = time.time()
-        print(f"✅ 并行完成片段{segment_index}分析: {segment['start_time']:.1f}s-{segment['end_time']:.1f}s (耗时: {end_time - start_time:.3f}s)")
+        print(f" 并行完成片段{segment_index}分析: {segment['start_time']:.1f}s-{segment['end_time']:.1f}s (耗时: {end_time - start_time:.3f}s)")
         return segment_summary
     except Exception as e:
-        print(f"❌ 并行分析片段{segment_index}失败: {e}")
+        print(f" 并行分析片段{segment_index}失败: {e}")
         return {
             'segment_index': segment_index,
             'time_range': f'{segment["start_time"]:.2f}s-{segment["end_time"]:.2f}s',
@@ -537,11 +537,11 @@ async def _preload_segment_analysis(time_segments: List[Dict], video_duration: f
         coordinator = get_vision_coordinator()
         
         if coordinator:
-            print(f"🚀 开始智能并行预加载片段分析: {len(time_segments)}个片段（使用API协调器）")
-            print(f"🔧 协调器状态: {coordinator.get_status()}")
+            print(f" 开始智能并行预加载片段分析: {len(time_segments)}个片段（使用API协调器）")
+            print(f" 协调器状态: {coordinator.get_status()}")
             
             await _send_trace(ws, 'system', 
-                f'🚀 启动{len(time_segments)}个片段的智能并行分析（无锁协调器）...', 
+                f' 启动{len(time_segments)}个片段的智能并行分析（无锁协调器）...', 
                 'smart_parallel_analysis_start', {
                     'total_segments': len(time_segments),
                     'parallel_mode': True,
@@ -550,7 +550,7 @@ async def _preload_segment_analysis(time_segments: List[Dict], video_duration: f
                 })
             
             max_concurrency = int(os.getenv('VL_MAX_CONCURRENCY', '6'))
-            print(f"📡 智能并行发起分析（限流并发={max_concurrency}）...")
+            print(f" 智能并行发起分析（限流并发={max_concurrency}）...")
 
             semaphore = asyncio.Semaphore(max_concurrency)
 
@@ -585,13 +585,13 @@ async def _preload_segment_analysis(time_segments: List[Dict], video_duration: f
                 segment_results.extend(await asyncio.gather(*batch, return_exceptions=True))
             end_time = time.time()
 
-            print(f"⚡ 智能并行分析完成！总耗时: {end_time - start_time:.2f}秒，完成片段={len(segment_results)}")
+            print(f" 智能并行分析完成！总耗时: {end_time - start_time:.2f}秒，完成片段={len(segment_results)}")
             
         else:
-            print(f"⚠️ 未配置API协调器，回退到顺序处理: {len(time_segments)}个片段")
+            print(f" 未配置API协调器，回退到顺序处理: {len(time_segments)}个片段")
             
             await _send_trace(ws, 'system', 
-                f'⚠️ API协调器未配置，启动{len(time_segments)}个片段的顺序分析...', 
+                f' API协调器未配置，启动{len(time_segments)}个片段的顺序分析...', 
                 'fallback_sequential_analysis_start', {
                     'total_segments': len(time_segments),
                     'parallel_mode': False,
@@ -603,16 +603,16 @@ async def _preload_segment_analysis(time_segments: List[Dict], video_duration: f
             
             for i, segment in enumerate(time_segments):
                 try:
-                    print(f"🎬 顺序分析片段{i+1}/{len(time_segments)}: {segment['start_time']:.1f}s-{segment['end_time']:.1f}s")
+                    print(f" 顺序分析片段{i+1}/{len(time_segments)}: {segment['start_time']:.1f}s-{segment['end_time']:.1f}s")
                     
                     result = await _analyze_single_segment(segment, video_duration, buf, i + 1)
                     segment_results.append(result)
                     
-                    print(f"✅ 片段{i+1}分析完成，进度: {((i+1)/len(time_segments)*100):.1f}%")
+                    print(f" 片段{i+1}分析完成，进度: {((i+1)/len(time_segments)*100):.1f}%")
                     
                     try:
                         await _send_trace(ws, 'system', 
-                            f'📹 片段{i+1}/{len(time_segments)}分析完成 ({((i+1)/len(time_segments)*100):.1f}%)', 
+                            f' 片段{i+1}/{len(time_segments)}分析完成 ({((i+1)/len(time_segments)*100):.1f}%)', 
                             'segment_progress', {
                                 'completed': i + 1,
                                 'total': len(time_segments),
@@ -625,7 +625,7 @@ async def _preload_segment_analysis(time_segments: List[Dict], video_duration: f
                         await asyncio.sleep(0.5)
                         
                 except Exception as e:
-                    print(f"❌ 片段{i+1}分析异常: {e}")
+                    print(f" 片段{i+1}分析异常: {e}")
                     fallback_segment = {
                         'segment_index': i + 1,
                         'time_range': f'{segment["start_time"]:.1f}s-{segment["end_time"]:.1f}s',
@@ -637,14 +637,14 @@ async def _preload_segment_analysis(time_segments: List[Dict], video_duration: f
                     segment_results.append(fallback_segment)
             
             end_time = time.time()
-            print(f"⚡ 顺序分析完成！总耗时: {end_time - start_time:.2f}秒")
+            print(f" 顺序分析完成！总耗时: {end_time - start_time:.2f}秒")
         
         successful_segments = []
         failed_count = 0
         
         for i, result in enumerate(segment_results):
             if isinstance(result, Exception):
-                print(f"❌ 片段{i+1}分析异常: {result}")
+                print(f" 片段{i+1}分析异常: {result}")
                 fallback_segment = {
                     'segment_index': i + 1,
                     'time_range': f'{time_segments[i]["start_time"]:.1f}s-{time_segments[i]["end_time"]:.1f}s',
@@ -657,15 +657,15 @@ async def _preload_segment_analysis(time_segments: List[Dict], video_duration: f
                 failed_count += 1
             else:
                 successful_segments.append(result)
-                print(f"✅ 片段{i+1}智能并行分析成功")
+                print(f" 片段{i+1}智能并行分析成功")
                 
                 try:
                     await _send_trace(ws, 'assistant', 
-                        f'📹 并行片段总结 ({result.get("time_range", "未知")}): {result.get("content", "")[:100]}...', 
+                        f' 并行片段总结 ({result.get("time_range", "未知")}): {result.get("content", "")[:100]}...', 
                         'segment_summary', result)
-                    print(f"✅ 已发送片段{i+1}的segment_summary到前端")
+                    print(f" 已发送片段{i+1}的segment_summary到前端")
                 except Exception as send_e:
-                    print(f"⚠️ 发送片段{i+1}的segment_summary失败: {send_e}")
+                    print(f" 发送片段{i+1}的segment_summary失败: {send_e}")
         
         cache['completed_segments'] = successful_segments
         cache['analysis_complete'] = len([s for s in successful_segments if isinstance(s, dict) and s.get('content')]) > 0
@@ -675,12 +675,12 @@ async def _preload_segment_analysis(time_segments: List[Dict], video_duration: f
             pass
         cache['analysis_progress'] = 100 if cache['analysis_complete'] else 0
         
-        print(f"🏁 审核数据已全部到达！成功分析{len(successful_segments) - failed_count}个片段，失败{failed_count}个片段")
-        print(f"🎉 顺序分析统计: 成功{len(successful_segments) - failed_count}个, 失败{failed_count}个, 总耗时{end_time - start_time:.2f}秒")
+        print(f" 审核数据已全部到达！成功分析{len(successful_segments) - failed_count}个片段，失败{failed_count}个片段")
+        print(f" 顺序分析统计: 成功{len(successful_segments) - failed_count}个, 失败{failed_count}个, 总耗时{end_time - start_time:.2f}秒")
         
         if cache['analysis_complete']:
             await _send_trace(ws, 'system', 
-                f'✅ 顺序分析完成: {len(successful_segments)}个片段 (耗时{end_time - start_time:.2f}s)', 
+                f' 顺序分析完成: {len(successful_segments)}个片段 (耗时{end_time - start_time:.2f}s)', 
                 'sequential_analysis_complete', {
                     'total_segments': len(successful_segments),
                     'successful': len(successful_segments) - failed_count,
@@ -690,7 +690,7 @@ async def _preload_segment_analysis(time_segments: List[Dict], video_duration: f
                 })
         else:
             await _send_trace(ws, 'system', 
-                '⚠️ 触发限流，暂未获得有效片段，总结未完成；将继续退避重试', 
+                ' 触发限流，暂未获得有效片段，总结未完成；将继续退避重试', 
                 'sequential_analysis_pending', {
                     'total_segments': len(successful_segments),
                     'successful': len(successful_segments) - failed_count,
@@ -699,14 +699,14 @@ async def _preload_segment_analysis(time_segments: List[Dict], video_duration: f
                 })
             
     except Exception as e:
-        print(f"❌ 并行预加载分析失败: {e}")
+        print(f" 并行预加载分析失败: {e}")
         cache['analysis_complete'] = False
         try:
             buf.segment_analysis_completed = False
         except Exception:
             pass
         completed_segments = cache.get('completed_segments', [])
-        print(f"🏁 异常中断，已分析{len(completed_segments)}个片段；未完成，将等待重试")
+        print(f" 异常中断，已分析{len(completed_segments)}个片段；未完成，将等待重试")
 
 async def _generate_time_based_segment_summary(memory: Dict, segment_info: Dict, video_duration: float, buf: 'SessionBuf' = None) -> Dict[str, Any]:
     """生成基于时间的视频片段总结"""
@@ -733,7 +733,7 @@ async def _generate_time_based_segment_summary(memory: Dict, segment_info: Dict,
             if not segment_frames and total_frames > 0:
                 segment_frames = [buf_frames[min(start_frame_idx, total_frames - 1)]]
                 
-            print(f"🎬 时间段{start_time:.1f}s-{end_time:.1f}s: 选择帧{start_frame_idx}-{end_frame_idx} (共{len(segment_frames)}帧)")
+            print(f" 时间段{start_time:.1f}s-{end_time:.1f}s: 选择帧{start_frame_idx}-{end_frame_idx} (共{len(segment_frames)}帧)")
             
             if segment_frames and VisionDSClient:
                 try:
@@ -744,17 +744,17 @@ async def _generate_time_based_segment_summary(memory: Dict, segment_info: Dict,
                     for frame_path in segment_frames:
                         if isinstance(frame_path, str) and frame_path.startswith('http://127.0.0.1:8799/static/'):
                             local_path = frame_path.replace('http://127.0.0.1:8799/static/', 'agent_backend/static/')
-                            print(f"🖼️ 处理时间段图片: {frame_path} -> {local_path}")
+                            print(f" 处理时间段图片: {frame_path} -> {local_path}")
                             try:
                                 if os.path.exists(local_path):
                                     with open(local_path, 'rb') as f:
                                         img_data = base64.b64encode(f.read()).decode('utf-8')
                                         img_inputs.append(f"data:image/jpeg;base64,{img_data}")
-                                        print(f"✅ 成功编码时间段图片: {local_path} ({len(img_data)} chars)")
+                                        print(f" 成功编码时间段图片: {local_path} ({len(img_data)} chars)")
                                 else:
-                                    print(f"❌ 时间段图片文件不存在: {local_path}")
+                                    print(f" 时间段图片文件不存在: {local_path}")
                             except Exception as e:
-                                print(f"❌ 时间段图片编码失败 {local_path}: {e}")
+                                print(f" 时间段图片编码失败 {local_path}: {e}")
                                 continue
                         elif isinstance(frame_path, str) and os.path.exists(frame_path):
                             try:
@@ -762,11 +762,11 @@ async def _generate_time_based_segment_summary(memory: Dict, segment_info: Dict,
                                     img_data = base64.b64encode(f.read()).decode('utf-8')
                                     img_inputs.append(f"data:image/jpeg;base64,{img_data}")
                             except Exception as e:
-                                print(f"❌ 时间段本地图片编码失败 {frame_path}: {e}")
+                                print(f" 时间段本地图片编码失败 {frame_path}: {e}")
                                 continue
                     
                     if not img_inputs:
-                        print(f"❌ 时间段{start_time:.1f}s-{end_time:.1f}s: 无可用图片输入")
+                        print(f" 时间段{start_time:.1f}s-{end_time:.1f}s: 无可用图片输入")
                         segment_content = f"第{segment_index}个时间段({start_time:.1f}s-{end_time:.1f}s)的视觉内容分析：无可用图片数据"
                     else:
                         time_prompt = f"""
@@ -795,7 +795,7 @@ async def _generate_time_based_segment_summary(memory: Dict, segment_info: Dict,
 在这{end_time - start_time:.1f}秒钟的视频片段中，...
 """
                         
-                        print(f"🎯 时间段{start_time:.1f}s-{end_time:.1f}s准备调用视觉模型: {len(img_inputs)}张图片")
+                        print(f" 时间段{start_time:.1f}s-{end_time:.1f}s准备调用视觉模型: {len(img_inputs)}张图片")
                         
                         if coordinator:
                             vl_result = await vision_client.qwen_vl_with_coordinator(
@@ -805,7 +805,7 @@ async def _generate_time_based_segment_summary(memory: Dict, segment_info: Dict,
                             ds = DSClient()
                             vl_result = await ds.qwen_vl(img_inputs, prompt=time_prompt)
                     
-                    print(f"🔍 时间段{start_time:.1f}s-{end_time:.1f}s DashScope返回结果调试:")
+                    print(f" 时间段{start_time:.1f}s-{end_time:.1f}s DashScope返回结果调试:")
                     print(f"   vl_result存在: {vl_result is not None}")
                     if vl_result:
                         print(f"   vl_result类型: {type(vl_result)}")
@@ -841,7 +841,7 @@ async def _generate_time_based_segment_summary(memory: Dict, segment_info: Dict,
                             
                             if isinstance(output, dict) and 'text' in output:
                                 output_text = output.get('text', '')
-                                print(f"✅ 使用直接text结构获取: {len(output_text)}字符")
+                                print(f" 使用直接text结构获取: {len(output_text)}字符")
                             
                             elif isinstance(output, dict) and 'choices' in output:
                                 choices = output.get('choices', [])
@@ -850,11 +850,11 @@ async def _generate_time_based_segment_summary(memory: Dict, segment_info: Dict,
                                     content_list = message.get('content', [])
                                     if content_list and len(content_list) > 0:
                                         output_text = content_list[0].get('text', '')
-                                        print(f"✅ 使用choices结构获取: {len(output_text)}字符")
+                                        print(f" 使用choices结构获取: {len(output_text)}字符")
                             
                             elif isinstance(output, str):
                                 output_text = output
-                                print(f"✅ 使用字符串结构获取: {len(output_text)}字符")
+                                print(f" 使用字符串结构获取: {len(output_text)}字符")
                             
                             if not output_text and isinstance(output, dict):
                                 def find_text_in_dict(d, path=""):
@@ -878,7 +878,7 @@ async def _generate_time_based_segment_summary(memory: Dict, segment_info: Dict,
                                 found_text, found_path = find_text_in_dict(output)
                                 if found_text:
                                     output_text = found_text
-                                    print(f"✅ 在路径 {found_path} 找到text: {len(output_text)}字符")
+                                    print(f" 在路径 {found_path} 找到text: {len(output_text)}字符")
                             
                             if output_text:
                                 segment_content = output_text[:800]  # 增加长度限制
@@ -921,23 +921,23 @@ async def _generate_time_based_segment_summary(memory: Dict, segment_info: Dict,
                                 except Exception:
                                     segment_confidence = None
 
-                                print(f"✅ 时间段{start_time:.1f}s-{end_time:.1f}s视觉分析完成: {len(segment_content)}字符，confidence={segment_confidence}")
-                                print(f"📝 分析内容预览: {segment_content[:200]}...")
+                                print(f" 时间段{start_time:.1f}s-{end_time:.1f}s视觉分析完成: {len(segment_content)}字符，confidence={segment_confidence}")
+                                print(f" 分析内容预览: {segment_content[:200]}...")
                             else:
-                                print(f"⚠️ 时间段{start_time:.1f}s-{end_time:.1f}s: 所有解析方法都未找到文本内容")
+                                print(f" 时间段{start_time:.1f}s-{end_time:.1f}s: 所有解析方法都未找到文本内容")
                                 print(f"   output结构: {type(output)}")
                                 print(f"   output内容预览: {str(output)[:200]}")
                                 segment_content = f"第{segment_index}个时间段({start_time:.1f}s-{end_time:.1f}s)的视觉内容分析：响应解析失败"
                         except Exception as parse_error:
-                            print(f"❌ 时间段{start_time:.1f}s-{end_time:.1f}s: 响应解析错误: {parse_error}")
+                            print(f" 时间段{start_time:.1f}s-{end_time:.1f}s: 响应解析错误: {parse_error}")
                             segment_content = f"第{segment_index}个时间段({start_time:.1f}s-{end_time:.1f}s)的视觉内容分析：解析错误"
                     else:
-                        print(f"❌ 时间段{start_time:.1f}s-{end_time:.1f}s: DashScope返回结构异常")
+                        print(f" 时间段{start_time:.1f}s-{end_time:.1f}s: DashScope返回结构异常")
                         segment_content = f"第{segment_index}个时间段({start_time:.1f}s-{end_time:.1f}s)的视觉内容分析失败：DashScope返回异常"
                         
                 except Exception as e:
                     error_message = str(e) if str(e) else f"{type(e).__name__}: {repr(e)}"
-                    print(f"❌ 时间段{start_time:.1f}s-{end_time:.1f}s视觉分析失败: {error_message}")
+                    print(f" 时间段{start_time:.1f}s-{end_time:.1f}s视觉分析失败: {error_message}")
                     if '429' in error_message or 'Too Many Requests' in error_message:
                         raise
                     segment_content = f"第{segment_index}个时间段({start_time:.1f}s-{end_time:.1f}s)的视觉内容分析失败: {error_message}"
@@ -1108,7 +1108,7 @@ async def run_cot_react(ds: DSClient, buf: 'SessionBuf', ws: WebSocket) -> Dict[
     
     segment_analysis_cache['total_segments_expected'] = total_segments
     
-    print(f"🎬 视频片段分析配置: 总时长={video_duration:.1f}s, 片段时长={segment_duration}s, 总片段数={total_segments}")
+    print(f" 视频片段分析配置: 总时长={video_duration:.1f}s, 片段时长={segment_duration}s, 总片段数={total_segments}")
     
     time_segments = []
     for i in range(total_segments):
@@ -1123,10 +1123,10 @@ async def run_cot_react(ds: DSClient, buf: 'SessionBuf', ws: WebSocket) -> Dict[
     
     current_segment_index = 0
     
-    print(f"🎬 片段分析等待帧数据准备，总共需要分析{len(time_segments)}个片段")
+    print(f" 片段分析等待帧数据准备，总共需要分析{len(time_segments)}个片段")
     
     for step in range(1, step_limit+1):
-        print(f"🔍 Step {step}: buf.frames={len(buf.frames)}, buf.audios={len(buf.audios)}")
+        print(f" Step {step}: buf.frames={len(buf.frames)}, buf.audios={len(buf.audios)}")
         
         try:
             if 'watch_progress' in buf.meta and isinstance(buf.meta.get('watch_progress'), (int, float)):
@@ -1191,15 +1191,15 @@ async def run_cot_react(ds: DSClient, buf: 'SessionBuf', ws: WebSocket) -> Dict[
                 except Exception:
                     action_obj = {}
         except Exception as e:
-            print(f"🔍 Step {step} 规划异常: {e}")
+            print(f" Step {step} 规划异常: {e}")
             await _send_trace(ws, 'system', f'规划失败: {e}', 'reasoning', None, 'error')
             break
 
         typ = (action_obj.get('type') or '').lower()
-        print(f"🔍 Step {step} AI返回类型: {typ}, 内容: {str(action_obj)[:200]}")
+        print(f" Step {step} AI返回类型: {typ}, 内容: {str(action_obj)[:200]}")
         if typ == 'thought':
             thought_text = action_obj.get('text','')
-            await _send_trace(ws, 'assistant', f'🤔 [{memory["watch_progress"]:.0f}%] {thought_text}', 'reasoning', {
+            await _send_trace(ws, 'assistant', f' [{memory["watch_progress"]:.0f}%] {thought_text}', 'reasoning', {
                 'step': step, 
                 'progress': memory['watch_progress'],
                 'streaming_mode': True
@@ -1254,14 +1254,14 @@ async def run_cot_react(ds: DSClient, buf: 'SessionBuf', ws: WebSocket) -> Dict[
                     'content': asr_result,
                     'timestamp': step
                 })
-                await _send_trace(ws, 'assistant', f'🎵 音频内容: {asr_result[:200]}', 'reasoning', {
+                await _send_trace(ws, 'assistant', f' 音频内容: {asr_result[:200]}', 'reasoning', {
                     'audio': obs.get('audio',''),
                     'progress': memory['watch_progress']
                 }, 'observation')
             elif tool == 'rules_retrieve':
                 rules = _rules_retrieve(memory['vision'], memory['asr'])
                 memory['rules'] = rules
-                await _send_trace(ws, 'assistant', f"📋 检索到{len(rules)}条潜在规则", 'reasoning', {
+                await _send_trace(ws, 'assistant', f" 检索到{len(rules)}条潜在规则", 'reasoning', {
                     'rules': rules,
                     'progress': memory['watch_progress']
                 }, 'observation')
@@ -1321,14 +1321,14 @@ async def run_cot_react(ds: DSClient, buf: 'SessionBuf', ws: WebSocket) -> Dict[
             await asyncio.sleep(tick_seconds)
             continue
         if typ == 'final':
-            print(f"🔍 Step {step} AI提前返回final结果: {action_obj}")
+            print(f" Step {step} AI提前返回final结果: {action_obj}")
             res = action_obj.get('result') or {}
             if {'risk_level','counters','summary'} <= set(res.keys()):
-                print(f"🔍 Final结果完整，直接返回")
+                print(f" Final结果完整，直接返回")
                 return res
-            print(f"🔍 Final结果不完整，fallback到默认判定")
+            print(f" Final结果不完整，fallback到默认判定")
             break
-        print(f"🔍 Step {step} 检查强制执行: vision={bool(memory['vision'])}, frames={len(buf.frames)}")
+        print(f" Step {step} 检查强制执行: vision={bool(memory['vision'])}, frames={len(buf.frames)}")
         if not memory['vision'] and len(buf.frames) > 0:
             await _send_trace(ws, 'assistant', f'[步骤{step}] 强制执行: vision_describe (LLM未主动调用)', 'reasoning', {
                 'step': step, 
@@ -1337,11 +1337,11 @@ async def run_cot_react(ds: DSClient, buf: 'SessionBuf', ws: WebSocket) -> Dict[
                 'progress': memory['watch_progress']
             }, 'action')
             
-            print(f"🔍 Step {step} 开始强制执行vision_describe")
+            print(f" Step {step} 开始强制执行vision_describe")
             obs = await _vision_describe(ds, buf)
             vision_result = obs.get('text','')
             memory['vision'] = (memory['vision'] + '\n' + vision_result).strip()
-            print(f"🔍 Step {step} 强制执行vision_describe完成: {len(vision_result)}字符")
+            print(f" Step {step} 强制执行vision_describe完成: {len(vision_result)}字符")
             
             risk_segments = obs.get('risk_segments', [])
             segments_info = obs.get('segments', [])
@@ -1356,11 +1356,11 @@ async def run_cot_react(ds: DSClient, buf: 'SessionBuf', ws: WebSocket) -> Dict[
                 'window_analyzed': f"{obs.get('window_start', 0):.1f}s-{obs.get('window_end', 0):.1f}s"
             })
             
-            observation_msg = f'📺 视觉发现: {vision_result[:200]}'
+            observation_msg = f' 视觉发现: {vision_result[:200]}'
             if risk_segments:
                 risk_count = len(risk_segments)
                 high_risk = len([r for r in risk_segments if r.get('risk_level') in ['high', 'ban']])
-                observation_msg += f' | ⚠️ 发现{risk_count}个风险片段({high_risk}个高风险)'
+                observation_msg += f' |  发现{risk_count}个风险片段({high_risk}个高风险)'
             
             await _send_trace(ws, 'assistant', observation_msg, 'reasoning', {
                 'images': obs.get('images',[]),
@@ -1373,10 +1373,10 @@ async def run_cot_react(ds: DSClient, buf: 'SessionBuf', ws: WebSocket) -> Dict[
             analysis_started = segment_analysis_cache.get('analysis_started', False)
             frames_count = len(buf.frames)
             
-            print(f"🔍 阈值检查: frames={frames_count}, 阈值={min_frames_needed}, 已启动={analysis_started}, 总片段={total_segments}")
+            print(f" 阈值检查: frames={frames_count}, 阈值={min_frames_needed}, 已启动={analysis_started}, 总片段={total_segments}")
             
             if (not getattr(buf, 'segment_analysis_started', False)) and (not analysis_started) and frames_count >= min_frames_needed:
-                print(f"🚀 帧数据准备充足({frames_count}帧，阈值{min_frames_needed})，现在启动智能并行片段分析（API协调器管理）")
+                print(f" 帧数据准备充足({frames_count}帧，阈值{min_frames_needed})，现在启动智能并行片段分析（API协调器管理）")
                 segment_analysis_cache['analysis_started'] = True
                 buf.segment_analysis_started = True
                 if not getattr(buf, 'segment_analysis_task', None) or buf.segment_analysis_task.done():
@@ -1391,7 +1391,7 @@ async def run_cot_react(ds: DSClient, buf: 'SessionBuf', ws: WebSocket) -> Dict[
                 if memory['watch_progress'] >= segment_progress_threshold - 5:  # 留5%缓冲
                     completed_segments = len(segment_analysis_cache.get('completed_segments', []))
                     await _send_trace(ws, 'system', 
-                        f'📊 当前播放到片段{current_segment_index + 1}，后台分析进度: {completed_segments}/{total_segments}', 
+                        f' 当前播放到片段{current_segment_index + 1}，后台分析进度: {completed_segments}/{total_segments}', 
                         'playback_progress', {
                             'current_playback_segment': current_segment_index + 1,
                             'analysis_completed': completed_segments,
@@ -1407,26 +1407,26 @@ async def run_cot_react(ds: DSClient, buf: 'SessionBuf', ws: WebSocket) -> Dict[
             await _send_trace(ws, 'assistant', obs.get('text','')[:300], 'reasoning', {'audio': obs.get('audio','')}, 'observation')
             continue
         
-        print(f"🔍 循环检查: use_asr={getattr(_REASONING_CFG, 'use_asr', False)}, has_asr={bool(memory['asr'])}, audio_count={len(buf.audios)}")
+        print(f" 循环检查: use_asr={getattr(_REASONING_CFG, 'use_asr', False)}, has_asr={bool(memory['asr'])}, audio_count={len(buf.audios)}")
         
         analysis_started = segment_analysis_cache.get('analysis_started', False)
         frames_available = len(buf.frames)
         
         if analysis_started or getattr(buf, 'segment_analysis_started', False):
-            print(f"🔍 并行分析已启动，可以结束循环")
+            print(f" 并行分析已启动，可以结束循环")
             break
         elif step >= 5 and frames_available == 0:
-            print(f"🔍 等待5步仍无帧数据，结束循环")
+            print(f" 等待5步仍无帧数据，结束循环")
             break
         elif step < step_limit:
-            print(f"🔍 继续等待帧数据或触发并行分析 (step {step}/{step_limit})")
+            print(f" 继续等待帧数据或触发并行分析 (step {step}/{step_limit})")
             continue
         else:
-            print(f"🔍 达到步数限制，结束循环")
+            print(f" 达到步数限制，结束循环")
             break
         
     if not (segment_analysis_cache.get('analysis_started', False) or getattr(buf, 'segment_analysis_started', False)):
-        print(f"🎬 并行分析未启动，回退到逐个片段分析模式")
+        print(f" 并行分析未启动，回退到逐个片段分析模式")
         while current_segment_index < len(time_segments):
             remaining_segment = time_segments[current_segment_index]
             
@@ -1437,14 +1437,14 @@ async def run_cot_react(ds: DSClient, buf: 'SessionBuf', ws: WebSocket) -> Dict[
             if segment_summary:
                 segment_summaries.append(segment_summary)
                 await _send_trace(ws, 'assistant', 
-                    f'📹 最终片段总结 ({remaining_segment["start_time"]:.1f}s-{remaining_segment["end_time"]:.1f}s): {segment_summary["content"][:100]}...', 
+                    f' 最终片段总结 ({remaining_segment["start_time"]:.1f}s-{remaining_segment["end_time"]:.1f}s): {segment_summary["content"][:100]}...', 
                     'segment_summary', segment_summary)
             
             current_segment_index += 1
     else:
-        print(f"🎬 并行分析已启动，跳过逐个片段分析，等待并行结果")
+        print(f" 并行分析已启动，跳过逐个片段分析，等待并行结果")
     
-    print(f"🎬 完成所有片段分析，总共生成 {len(segment_summaries)} 个时间段总结")
+    print(f" 完成所有片段分析，总共生成 {len(segment_summaries)} 个时间段总结")
 
     risk_assessment = await _assess_accumulated_risk(memory['stream_annotations'])
     
@@ -1508,13 +1508,13 @@ async def run_cot_react(ds: DSClient, buf: 'SessionBuf', ws: WebSocket) -> Dict[
     
     if segment_analysis_cache['analysis_complete']:
         segment_summaries = segment_analysis_cache['completed_segments']
-        print(f"✅ 片段分析完成，获得 {len(segment_summaries)} 个片段总结")
-        print(f"🏁 审核数据已全部到达！共计{len(segment_summaries)}个片段的分析结果已存储完毕")
+        print(f" 片段分析完成，获得 {len(segment_summaries)} 个片段总结")
+        print(f" 审核数据已全部到达！共计{len(segment_summaries)}个片段的分析结果已存储完毕")
     else:
-        print(f"⚠️ 片段分析超时，已等待{wait_time}s，使用现有结果")
+        print(f" 片段分析超时，已等待{wait_time}s，使用现有结果")
         segment_summaries = segment_analysis_cache.get('completed_segments', [])
     
-    print(f"🎬 最终片段分析统计: {len(segment_summaries)} 个时间段总结")
+    print(f" 最终片段分析统计: {len(segment_summaries)} 个时间段总结")
     
     try:
         await _send_trace(ws, 'assistant', '合成最终结论…', 'judge')
@@ -1603,7 +1603,7 @@ async def _analyze_comment_content(ds: 'DSClient', comment_text: str) -> Dict[st
     
     try:
         response = await ds.qwen_text(enhanced_prompt)
-        logger.info(f"🧠 qwen2.5-flash评论分析响应: {type(response)}")
+        logger.info(f" qwen2.5-flash评论分析响应: {type(response)}")
         
         output = response.get('output') if isinstance(response, dict) else {}
         
@@ -1623,7 +1623,7 @@ async def _analyze_comment_content(ds: 'DSClient', comment_text: str) -> Dict[st
         reason = result.get('reason', '无明显违规内容')
         confidence = float(result.get('confidence', 0.8))
         
-        logger.info(f"✅ 评论分析完成: {risk_level} (置信度: {confidence:.2f})")
+        logger.info(f" 评论分析完成: {risk_level} (置信度: {confidence:.2f})")
         
         return {
             'risk_level': risk_level,
@@ -1633,7 +1633,7 @@ async def _analyze_comment_content(ds: 'DSClient', comment_text: str) -> Dict[st
         }
         
     except Exception as e:
-        logger.error(f"❌ 评论分析失败: {e}")
+        logger.error(f" 评论分析失败: {e}")
         return {
             'risk_level': 'low',
             'violation_type': None,
@@ -1668,7 +1668,7 @@ async def analyze_comments(req: CommentAnalysisRequest):
         results = []
         counters = {"low": 0, "medium": 0, "high": 0, "ban": 0}
         
-        logger.info(f"🔍 开始分析 {len(req.comments)} 条评论")
+        logger.info(f" 开始分析 {len(req.comments)} 条评论")
         
         for i, comment in enumerate(req.comments):
             comment_text = comment.get('detail', comment.get('content', comment.get('text', '')))
@@ -1677,7 +1677,7 @@ async def analyze_comments(req: CommentAnalysisRequest):
             if not comment_text or len(comment_text.strip()) == 0:
                 continue
                 
-            logger.info(f"📝 分析评论 {i+1}/{len(req.comments)}: {comment_text[:50]}...")
+            logger.info(f" 分析评论 {i+1}/{len(req.comments)}: {comment_text[:50]}...")
             
             analysis = await _analyze_comment_content(ds, comment_text)
             
@@ -1697,7 +1697,7 @@ async def analyze_comments(req: CommentAnalysisRequest):
             if i < len(req.comments) - 1:
                 await asyncio.sleep(0.1)
         
-        logger.info(f"✅ 评论分析完成: {counters}")
+        logger.info(f" 评论分析完成: {counters}")
         
         return JSONResponse({
             "task_id": task_id,
@@ -1709,7 +1709,7 @@ async def analyze_comments(req: CommentAnalysisRequest):
         })
         
     except Exception as e:
-        logger.error(f"❌ 评论批量分析失败: {e}")
+        logger.error(f" 评论批量分析失败: {e}")
         return JSONResponse({
             "task_id": task_id,
             "status": "error",
@@ -1725,16 +1725,16 @@ async def get_cached_result(session_id: str):
         if session_id in sessions:
             buf = sessions[session_id]
             if buf.final_result:
-                print(f"📤 返回缓存的分析结果，会话: {session_id}")
+                print(f" 返回缓存的分析结果，会话: {session_id}")
                 return {"success": True, "data": buf.final_result}
             else:
-                print(f"⚠️ 会话 {session_id} 暂无缓存结果")
+                print(f" 会话 {session_id} 暂无缓存结果")
                 return {"success": False, "message": "分析尚未完成或结果不可用"}
         else:
-            print(f"❌ 会话 {session_id} 不存在")
+            print(f" 会话 {session_id} 不存在")
             return {"success": False, "message": "会话不存在"}
     except Exception as e:
-        print(f"❌ 获取缓存结果失败: {e}")
+        print(f" 获取缓存结果失败: {e}")
         return {"success": False, "message": str(e)}
 
 
@@ -1818,7 +1818,7 @@ async def _auto_extract_frames_for_session(buf: 'SessionBuf', ws: WebSocket):
         try:
             await ws.send_text(json.dumps({'type': 'trace', 'data': {
                 'role': 'system',
-                'text': f'🚀 后端自动提取帧启动: 目标30帧',
+                'text': f' 后端自动提取帧启动: 目标30帧',
                 'stage': 'auto_extract_start'
             }}, ensure_ascii=False))
         except Exception:
@@ -1853,7 +1853,7 @@ async def _auto_extract_frames_for_session(buf: 'SessionBuf', ws: WebSocket):
         try:
             await ws.send_text(json.dumps({'type': 'trace', 'data': {
                 'role': 'system',
-                'text': f'✅ 后端自动注入帧完成: {injected}帧',
+                'text': f' 后端自动注入帧完成: {injected}帧',
                 'stage': 'auto_extract_done',
                 'payload': {'injected': injected}
             }}, ensure_ascii=False))
@@ -1864,7 +1864,7 @@ async def _auto_extract_frames_for_session(buf: 'SessionBuf', ws: WebSocket):
         try:
             await ws.send_text(json.dumps({'type': 'trace', 'data': {
                 'role': 'system',
-                'text': '❌ 后端自动提取帧失败',
+                'text': ' 后端自动提取帧失败',
                 'stage': 'auto_extract_error'
             }}, ensure_ascii=False))
         except Exception:
@@ -1874,7 +1874,7 @@ async def _auto_extract_frames_for_session(buf: 'SessionBuf', ws: WebSocket):
 async def ws_stream(ws: WebSocket):
     await ws.accept()
     
-    print(f"🔗 WebSocket连接已建立，无心跳超时限制")
+    print(f" WebSocket连接已建立，无心跳超时限制")
     
     sid = str(uuid.uuid4())
     buf = SessionBuf(sid)
@@ -1931,7 +1931,7 @@ async def ws_stream(ws: WebSocket):
                     asyncio.create_task(_auto_extract_frames_for_session(buf, ws))
                 
                 if not buf.cot_react_completed and duration_sec > 0:
-                    print(f"🚀 启动智能体分析会话: {sid}")
+                    print(f" 启动智能体分析会话: {sid}")
                     buf.cot_react_completed = True  # 标记为已启动，避免重复
                     
                     async def run_analysis():
@@ -1940,7 +1940,7 @@ async def ws_stream(ws: WebSocket):
                             buf.final_result = result
                             
                             result_data = json.dumps({'type': 'result', 'data': result}, ensure_ascii=False)
-                            print(f"🎯 准备发送最终结果: risk_level={result.get('risk_level', 'unknown')}, segment_count={len(result.get('segment_summaries', []))}")
+                            print(f" 准备发送最终结果: risk_level={result.get('risk_level', 'unknown')}, segment_count={len(result.get('segment_summaries', []))}")
                             
                             try:
                                 max_retries = 3
@@ -1948,37 +1948,37 @@ async def ws_stream(ws: WebSocket):
                                     try:
                                         if hasattr(ws, 'client_state') and ws.client_state.value == 1:  # WebSocketState.CONNECTED = 1
                                             await ws.send_text(result_data)
-                                            print(f"✅ 智能体分析完成，最终结果已发送，会话: {sid}")
+                                            print(f" 智能体分析完成，最终结果已发送，会话: {sid}")
                                             break
                                         else:
-                                            print(f"⚠️ WebSocket已断开(状态: {getattr(ws, 'client_state', 'unknown')})，尝试重新连接...")
+                                            print(f" WebSocket已断开(状态: {getattr(ws, 'client_state', 'unknown')})，尝试重新连接...")
                                             if attempt < max_retries - 1:
                                                 await asyncio.sleep(1)  # 等待1秒后重试
                                                 continue
                                             else:
-                                                print(f"🔄 WebSocket连接失败，将结果存储到缓存等待前端重新获取")
+                                                print(f" WebSocket连接失败，将结果存储到缓存等待前端重新获取")
                                                 buf.final_result = result
                                     except Exception as retry_e:
-                                        print(f"❌ 发送尝试 {attempt + 1} 失败: {retry_e}")
+                                        print(f" 发送尝试 {attempt + 1} 失败: {retry_e}")
                                         if attempt < max_retries - 1:
                                             await asyncio.sleep(1)
                                         else:
-                                            print(f"🔄 所有发送尝试失败，结果已保存到缓存")
+                                            print(f" 所有发送尝试失败，结果已保存到缓存")
                                             buf.final_result = result
                             except Exception as send_e:
-                                print(f"❌ 发送最终结果失败: {send_e}")
+                                print(f" 发送最终结果失败: {send_e}")
                                 buf.final_result = result
                         except Exception as e:
-                            print(f"❌ 智能体分析失败: {e}")
+                            print(f" 智能体分析失败: {e}")
                             error_result = {"error": str(e), "risk_level": "unknown"}
                             
                             try:
                                 if hasattr(ws, 'client_state') and ws.client_state.value == 1:
                                     await ws.send_text(json.dumps({'type': 'result', 'data': error_result}, ensure_ascii=False))
                                 else:
-                                    print(f"⚠️ WebSocket已断开，无法发送错误结果")
+                                    print(f" WebSocket已断开，无法发送错误结果")
                             except Exception as send_error:
-                                print(f"⚠️ 发送错误结果失败: {send_error}")
+                                print(f" 发送错误结果失败: {send_error}")
                     
                     asyncio.create_task(run_analysis())
             elif mtype == 'frame':
@@ -2004,7 +2004,7 @@ async def ws_stream(ws: WebSocket):
                             'type': 'trace',
                             'data': {
                                 'role': 'system',
-                                'text': f"✓ 接收后端提取帧: {os.path.basename(frame_url)}",
+                                'text': f" 接收后端提取帧: {os.path.basename(frame_url)}",
                                 'ts': int(time.time() * 1000)
                             }
                         }, ensure_ascii=False))
@@ -2052,7 +2052,7 @@ async def ws_stream(ws: WebSocket):
                         'type': 'trace',
                         'data': {
                             'role': 'system',
-                            'text': f"✓ 播放进度上报: {progress_pct:.1f}% (t={current_time:.2f}s, x{playback_rate:.2f})",
+                            'text': f" 播放进度上报: {progress_pct:.1f}% (t={current_time:.2f}s, x{playback_rate:.2f})",
                             'stage': 'progress',
                             'payload': {
                                 'current_time': current_time,
@@ -2071,4 +2071,4 @@ async def ws_stream(ws: WebSocket):
         pass
     finally:
         sessions.pop(sid, None)
-        print(f"🔌 WebSocket连接已关闭，会话清理完成: {sid}")
+        print(f" WebSocket连接已关闭，会话清理完成: {sid}")

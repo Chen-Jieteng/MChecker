@@ -62,9 +62,9 @@ async def run_dagster_job(run_config: Dict[str, Any]):
     """在后台运行 Dagster 作业"""
     try:
         result = execute_job_sync(doc_generation_job, run_config=run_config)
-        print(f"✅ Dagster 作业执行完成: {result.run_id}")
+        print(f" Dagster 作业执行完成: {result.run_id}")
     except Exception as e:
-        print(f"❌ Dagster 作业执行失败: {e}")
+        print(f" Dagster 作业执行失败: {e}")
 
 
 @app.get("/api/doc-automation/health")

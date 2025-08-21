@@ -25,7 +25,7 @@ class DSClient:
         self.vl_model = vl_model or os.getenv('DASHSCOPE_VL_MODEL', 'qwen-vl-plus')
         self.asr_model = asr_model or os.getenv('DASHSCOPE_ASR_MODEL', 'qwen-audio-asr')
         
-        print(f"🔧 DSClient模型配置:")
+        print(f" DSClient模型配置:")
         print(f"   文本模型: {self.text_model}")
         print(f"   视觉模型: {self.vl_model}")
         print(f"   语音模型: {self.asr_model}")

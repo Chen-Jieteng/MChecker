@@ -287,13 +287,13 @@ class DocumentGenerator:
 ```
 
 
-- **整体准确率**: {self.audit_data['summary']['accuracy_rate']:.1%} ↗️ (+1.2%)
-- **误判率**: {(1-self.audit_data['summary']['accuracy_rate'])*100:.1f}% ↘️ (-1.2%)
-- **申诉成功率**: 9.2% ↘️ (-2.1%)
+- **整体准确率**: {self.audit_data['summary']['accuracy_rate']:.1%} ↗ (+1.2%)
+- **误判率**: {(1-self.audit_data['summary']['accuracy_rate'])*100:.1f}% ↘ (-1.2%)
+- **申诉成功率**: 9.2% ↘ (-2.1%)
 
-- **平均处理时间**: {self.audit_data['summary']['avg_processing_time']}s ↘️ (-0.3s)
-- **SLA达成率**: 97.8% ↗️ (+2.1%)
-- **人工复审率**: {self.audit_data['summary']['under_review']/self.audit_data['summary']['total_videos']*100:.1f}% ↘️ (-1.5%)
+- **平均处理时间**: {self.audit_data['summary']['avg_processing_time']}s ↘ (-0.3s)
+- **SLA达成率**: 97.8% ↗ (+2.1%)
+- **人工复审率**: {self.audit_data['summary']['under_review']/self.audit_data['summary']['total_videos']*100:.1f}% ↘ (-1.5%)
 
 
 ```
@@ -354,8 +354,8 @@ class DocumentGenerator:
         """生成政策规则章节"""
         policies_text = ""
         for policy in self.knowledge_base["policies"]:
-            severity_emoji = {"low": "🟢", "medium": "🟡", "high": "🟠", "critical": "🔴"}
-            emoji = severity_emoji.get(policy["severity"], "⚪")
+            severity_emoji = {"low": "", "medium": "", "high": "", "critical": ""}
+            emoji = severity_emoji.get(policy["severity"], "")
             
             policies_text += f"""
 

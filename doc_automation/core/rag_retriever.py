@@ -26,7 +26,7 @@ class RAGRetriever:
         embedding = self.embedding_model.encode(text_content)
         self.embeddings[source_name] = embedding
         
-        print(f"✅ 已索引数据源: {source_name}")
+        print(f" 已索引数据源: {source_name}")
     
     def retrieve(self, query: str, limit: int = 5) -> str:
         """检索相关信息"""

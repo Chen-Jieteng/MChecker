@@ -75,9 +75,9 @@ async def emit_event(session_id: str, event_type: str, data: Dict[Any, Any]):
                 'data': data
             }
             await session.websocket.send_text(json.dumps(event, ensure_ascii=False))
-            logger.info(f"📡 Event sent: {event_type} to session {session_id}")
+            logger.info(f" Event sent: {event_type} to session {session_id}")
         except Exception as e:
-            logger.error(f"❌ Failed to send event {event_type}: {e}")
+            logger.error(f" Failed to send event {event_type}: {e}")
 
 
 class TaskManager:
@@ -142,7 +142,7 @@ class TaskManager:
             task.error = str(e)
             task.completed_at = datetime.now()
             
-            logger.error(f"❌ Task {task_id} failed: {e}")
+            logger.error(f" Task {task_id} failed: {e}")
             await emit_event(session_id, 'task_failed', {
                 'task_id': task_id,
                 'task_type': task.type.value,
@@ -228,7 +228,7 @@ async def handle_start_workflow(session_id: str, data: Dict[Any, Any]):
     if session:
         session.aweme_id = aweme_id
     
-    logger.info(f"🚀 Starting workflow for video: {aweme_id}")
+    logger.info(f" Starting workflow for video: {aweme_id}")
     
     tasks = []
     if aweme_id:
@@ -244,7 +244,7 @@ async def handle_start_workflow(session_id: str, data: Dict[Any, Any]):
 async def handle_agent_audit(session_id: str, data: Dict[Any, Any]):
     """处理智能体审核请求"""
     aweme_id = data.get('aweme_id')
-    logger.info(f"🤖 Agent audit started for: {aweme_id}")
+    logger.info(f" Agent audit started for: {aweme_id}")
     
     await handle_start_workflow(session_id, data)
 
@@ -277,7 +277,7 @@ async def handle_legacy_meta(session_id: str, data: Dict[Any, Any]):
         session = workflow_sessions.get(session_id)
         if session:
             session.aweme_id = aweme_id
-        logger.info(f"📝 Meta updated for: {aweme_id}")
+        logger.info(f" Meta updated for: {aweme_id}")
         
         await handle_start_workflow(session_id, {
             'aweme_id': aweme_id,
@@ -286,11 +286,11 @@ async def handle_legacy_meta(session_id: str, data: Dict[Any, Any]):
 
 async def handle_legacy_audio(session_id: str, data: Dict[Any, Any]):
     """处理legacy audio消息"""
-    logger.debug(f"🎵 Audio data received for session: {session_id}")
+    logger.debug(f" Audio data received for session: {session_id}")
 
 async def handle_legacy_frame(session_id: str, data: Dict[Any, Any]):
     """处理legacy frame消息"""
-    logger.debug(f"📹 Frame data received for session: {session_id}")
+    logger.debug(f" Frame data received for session: {session_id}")
 
 
 @app.websocket("/ws/stream")
@@ -303,7 +303,7 @@ async def ws_stream(ws: WebSocket):
     workflow_sessions[session_id] = session
     
     try:
-        logger.info(f"🔗 WebSocket connected: {session_id}")
+        logger.info(f" WebSocket connected: {session_id}")
         
         await emit_event(session_id, 'system_ready', {
             'ds_available': True,
@@ -329,16 +329,16 @@ async def ws_stream(ws: WebSocket):
                 elif data.get('type') == 'frame':
                     await handle_legacy_frame(session_id, data)
                             else:
-                    logger.debug(f"📨 Unhandled message type: {data.get('type')}")
+                    logger.debug(f" Unhandled message type: {data.get('type')}")
                         
                 except Exception as e:
-                logger.error(f"❌ Message processing error: {e}")
+                logger.error(f" Message processing error: {e}")
                 continue
     
     except WebSocketDisconnect:
-        logger.info(f"🔌 WebSocket disconnected: {session_id}")
+        logger.info(f" WebSocket disconnected: {session_id}")
     except Exception as e:
-        logger.error(f"❌ WebSocket error: {e}")
+        logger.error(f" WebSocket error: {e}")
     finally:
         if session_id in workflow_sessions:
             del workflow_sessions[session_id]
@@ -358,7 +358,7 @@ class CommentAnalysisRequest(BaseModel):
 @app.post("/agent/audit")
 async def agent_audit(request: AuditRequest):
     """智能体审核端点 - 兼容性接口"""
-    logger.info(f"🤖 Agent audit requested for: {request.aweme_id}")
+    logger.info(f" Agent audit requested for: {request.aweme_id}")
     
     result = {
         "video_analysis": {
@@ -387,7 +387,7 @@ async def agent_audit(request: AuditRequest):
 @app.post("/extract/frames")
 async def extract_frames(request: FrameExtractionRequest):
     """视频帧提取端点 - 兼容性接口"""
-    logger.info(f"📹 Frame extraction requested for: {request.aweme_id}")
+    logger.info(f" Frame extraction requested for: {request.aweme_id}")
     
     frames = [
         {
@@ -413,7 +413,7 @@ async def analyze_comments(request: CommentAnalysisRequest = None):
     if not isinstance(comments, list):
         comments = []
     
-    logger.info(f"💬 Comment analysis requested for: {aweme_id}, comments count: {len(comments)}")
+    logger.info(f" Comment analysis requested for: {aweme_id}, comments count: {len(comments)}")
     
     if not comments:
         comments = ["这个视频很棒！", "喜欢这个内容", "不错的分享", "有意思"]
@@ -472,5 +472,5 @@ async def root():
 
 if __name__ == "__main__":
     import uvicorn
-    print("🚀 Starting Event-Driven Agent Backend...")
+    print(" Starting Event-Driven Agent Backend...")
     uvicorn.run(app, host="0.0.0.0", port=8799, log_level="info")

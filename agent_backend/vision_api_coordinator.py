@@ -75,7 +75,7 @@ class VisionApiCoordinator:
         ]
         
         
-        logger.info(f"🔧 视觉API协调器初始化: {len(api_keys)}个KEY, 每KEY最大并发{max_concurrent_per_key}, 每分钟{max_per_minute_per_key}请求")
+        logger.info(f" 视觉API协调器初始化: {len(api_keys)}个KEY, 每KEY最大并发{max_concurrent_per_key}, 每分钟{max_per_minute_per_key}请求")
     
     async def acquire_api_key(self, timeout: float = 30.0) -> Optional[ApiKeyStats]:
         """
@@ -96,7 +96,7 @@ class VisionApiCoordinator:
                 chosen_key = min(available_keys, key=lambda x: x.current_concurrent)
                 
                 if chosen_key.try_acquire():
-                    logger.debug(f"🔑 并行获取API KEY: {chosen_key.key[:8]}*** "
+                    logger.debug(f" 并行获取API KEY: {chosen_key.key[:8]}*** "
                                f"(并发: {chosen_key.current_concurrent}/{chosen_key.max_concurrent}, "
                                f"分钟请求: {chosen_key.requests_this_minute}/{chosen_key.max_per_minute})")
                     
@@ -104,13 +104,13 @@ class VisionApiCoordinator:
             
             await asyncio.sleep(0.1)
         
-        logger.warning(f"⚠️ API KEY获取超时({timeout}s)，所有KEY都达到限制")
+        logger.warning(f" API KEY获取超时({timeout}s)，所有KEY都达到限制")
         return None
     
     def release_api_key(self, key_stats: ApiKeyStats):
         """释放API KEY"""
         key_stats.release()
-        logger.debug(f"📤 释放API KEY: {key_stats.key[:8]}*** "
+        logger.debug(f" 释放API KEY: {key_stats.key[:8]}*** "
                     f"(剩余并发: {key_stats.current_concurrent}/{key_stats.max_concurrent})")
     
     def get_status(self) -> Dict[str, Any]:
@@ -152,7 +152,7 @@ def init_vision_coordinator():
     vision_keys = [k.strip() for k in vision_keys_raw.split(',') if k.strip()]
     
     if not vision_keys:
-        logger.warning("⚠️ 未配置视觉API KEY，将使用默认轮换机制")
+        logger.warning(" 未配置视觉API KEY，将使用默认轮换机制")
         return
     
     max_concurrent = int(os.getenv("VISION_API_MAX_CONCURRENT_PER_KEY", "5"))
@@ -164,7 +164,7 @@ def init_vision_coordinator():
         max_per_minute_per_key=max_per_minute
     )
     
-    logger.info(f"✅ 视觉API协调器已启动: {len(vision_keys)}个专用KEY")
+    logger.info(f" 视觉API协调器已启动: {len(vision_keys)}个专用KEY")
 
 def get_vision_coordinator() -> Optional[VisionApiCoordinator]:
     """获取全局视觉API协调器"""
