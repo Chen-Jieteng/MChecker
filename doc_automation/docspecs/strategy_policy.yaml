@@ -1,0 +1,147 @@
+# 策略文档规格模板
+name: "内容策略文档"
+type: "strategy_policy"
+version: "1.0.0"
+
+metadata:
+  title: "内容审核策略与规范文档"
+  subtitle: "{{ strategy_version }} 版本策略规范"
+  author: "内容安全团队"
+  created_at: "{{ timestamp }}"
+  update_frequency: "每月更新"
+
+sections:
+  - id: "executive_summary"
+    title: "执行摘要"
+    type: "text"
+    prompts:
+      - "基于最新的审核数据和政策变更，总结本月策略调整的核心要点"
+      - "突出关键风险类别的变化趋势和应对措施"
+    data_sources:
+      - "policy_changes_log"
+      - "risk_trend_analysis"
+
+  - id: "audit_workflow"
+    title: "审核流程定义"
+    type: "flowchart"
+    mermaid_template: |
+      flowchart TD
+        A[内容提交] --> B{预筛选}
+        B -->|通过| C[机器审核]
+        B -->|拦截| D[直接拒绝]
+        C --> E{风险评分}
+        E -->|低风险| F[自动通过]
+        E -->|中风险| G[人工审核]
+        E -->|高风险| H[专家审核]
+        G --> I{审核结果}
+        H --> I
+        I -->|通过| J[发布]
+        I -->|拒绝| K[通知用户]
+        I -->|复审| L[二次审核]
+    data_sources:
+      - "audit_flow_config"
+
+  - id: "risk_categories"
+    title: "风险分类与阈值"
+    type: "table"
+    table_schema:
+      columns:
+        - name: "风险类别"
+          type: "string"
+        - name: "风险等级"
+          type: "enum"
+          values: ["低", "中", "高", "极高"]
+        - name: "判定阈值"
+          type: "float"
+        - name: "处置措施"
+          type: "string"
+        - name: "升级条件"
+          type: "string"
+    data_sources:
+      - "risk_threshold_config"
+      - "policy_rules_mapping"
+
+  - id: "priority_matrix"
+    title: "优先级处理矩阵"
+    type: "heatmap"
+    chart_config:
+      x_axis: "内容类型"
+      y_axis: "风险等级"
+      color_scale: "处理优先级"
+    data_sources:
+      - "priority_config"
+
+  - id: "differential_strategy"
+    title: "差异化策略配置"
+    type: "accordion"
+    subsections:
+      - title: "短视频策略"
+        data_source: "short_video_policy"
+      - title: "直播策略"
+        data_source: "live_stream_policy"
+      - title: "图文策略"
+        data_source: "image_text_policy"
+      - title: "评论策略"
+        data_source: "comment_policy"
+
+  - id: "machine_audit_paths"
+    title: "机审路径配置"
+    type: "sankey"
+    chart_config:
+      flows:
+        - from: "内容类型"
+        - to: "检测模型"
+        - to: "处理策略"
+    data_sources:
+      - "audit_path_config"
+      - "model_routing_rules"
+
+  - id: "performance_benchmarks"
+    title: "策略效果基准"
+    type: "metrics_dashboard"
+    metrics:
+      - name: "准确率"
+        target: ">= 95%"
+        current: "{{ accuracy_rate }}"
+      - name: "误杀率"
+        target: "<= 2%"
+        current: "{{ false_positive_rate }}"
+      - name: "漏判率"
+        target: "<= 1%"
+        current: "{{ false_negative_rate }}"
+      - name: "处理时长"
+        target: "<= 30s"
+        current: "{{ avg_processing_time }}"
+    data_sources:
+      - "audit_performance_metrics"
+
+rag_config:
+  retrieval_methods:
+    - "semantic_chunking"
+    - "proposition_chunking"
+    - "contextual_chunk_headers"
+  embedding_model: "bge-m3"
+  rerank_model: "bge-reranker-v2"
+  knowledge_sources:
+    - "policy_documents"
+    - "regulation_updates"
+    - "historical_cases"
+    - "expert_annotations"
+
+output_formats:
+  - format: "markdown"
+    template: "strategy_policy.md.j2"
+  - format: "docx"
+    template: "strategy_policy.docx.j2"
+  - format: "confluence"
+    space: "CONTENT_SAFETY"
+    parent_page: "策略文档"
+
+validation:
+  schema_check: true
+  rag_evaluation:
+    - metric: "faithfulness"
+      threshold: 0.8
+    - metric: "relevance"
+      threshold: 0.85
+  human_review_required: true

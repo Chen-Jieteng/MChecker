@@ -1,0 +1,13 @@
+{
+  "files": [],
+  "references": [
+    { "path": "./douyin/tsconfig.node.json" },
+    { "path": "./douyin/tsconfig.app.json" }
+  ],
+  "compilerOptions": {
+    "baseUrl": ".",
+    "paths": {
+      "@/*": ["douyin/src/*"]
+    }
+  }
+}

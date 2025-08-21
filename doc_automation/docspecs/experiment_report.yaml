@@ -1,0 +1,171 @@
+# 实验报告规格模板
+name: "实验与优化报告"
+type: "experiment_report"
+version: "1.0.0"
+
+metadata:
+  title: "{{ experiment_name }} 实验报告"
+  subtitle: "A/B测试与Prompt优化分析"
+  author: "算法优化团队"
+  created_at: "{{ timestamp }}"
+  experiment_period: "{{ start_date }} - {{ end_date }}"
+
+sections:
+  - id: "experiment_overview"
+    title: "实验概述"
+    type: "summary_card"
+    metrics:
+      - name: "实验周期"
+        value: "{{ experiment_duration }}"
+      - name: "样本量"
+        value: "{{ total_samples }}"
+      - name: "实验组数"
+        value: "{{ group_count }}"
+      - name: "统计显著性"
+        value: "{{ statistical_significance }}"
+    prompts:
+      - "总结实验的核心目标和设计思路"
+      - "说明实验设置的合理性和创新点"
+
+  - id: "hypothesis_design"
+    title: "假设与设计"
+    type: "structured_text"
+    subsections:
+      - title: "实验假设"
+        data_source: "experiment_hypothesis"
+      - title: "实验设计"
+        data_source: "experiment_design"
+      - title: "样本分配"
+        data_source: "sample_allocation"
+      - title: "评估指标"
+        data_source: "evaluation_metrics"
+
+  - id: "prompt_experiments"
+    title: "Prompt实验分析"
+    type: "comparison_table"
+    table_schema:
+      columns:
+        - name: "Prompt版本"
+          type: "string"
+        - name: "核心变更"
+          type: "text"
+        - name: "准确率"
+          type: "percentage"
+        - name: "响应时间"
+          type: "duration"
+        - name: "Token消耗"
+          type: "integer"
+        - name: "成本效益"
+          type: "currency"
+    data_sources:
+      - "prompt_experiment_results"
+      - "prompt_version_comparison"
+
+  - id: "ab_test_results"
+    title: "A/B测试结果"
+    type: "multi_chart"
+    charts:
+      - type: "bar_chart"
+        title: "关键指标对比"
+        data_source: "ab_metrics_comparison"
+      - type: "line_chart"
+        title: "时间序列趋势"
+        data_source: "ab_time_series"
+      - type: "funnel_chart"
+        title: "转化漏斗分析"
+        data_source: "ab_funnel_analysis"
+
+  - id: "performance_trends"
+    title: "性能趋势分析"
+    type: "dashboard"
+    widgets:
+      - type: "time_series"
+        title: "模型准确率趋势"
+        metrics: ["accuracy", "precision", "recall", "f1_score"]
+        data_source: "model_performance_history"
+      - type: "heatmap"
+        title: "错误类型分布"
+        data_source: "error_type_distribution"
+      - type: "scatter_plot"
+        title: "延迟vs准确率关系"
+        data_source: "latency_accuracy_correlation"
+
+  - id: "version_comparison"
+    title: "版本迭代效果"
+    type: "version_timeline"
+    timeline_config:
+      events:
+        - date: "版本发布日期"
+        - title: "版本名称"
+        - description: "主要变更"
+        - metrics: "关键指标变化"
+    data_sources:
+      - "model_version_history"
+      - "version_performance_delta"
+
+  - id: "statistical_analysis"
+    title: "统计分析"
+    type: "statistical_report"
+    analyses:
+      - name: "显著性检验"
+        method: "t-test"
+        confidence_level: 0.95
+      - name: "效应量分析"
+        method: "cohen_d"
+      - name: "置信区间"
+        confidence_level: 0.95
+    data_sources:
+      - "statistical_test_results"
+
+  - id: "issues_findings"
+    title: "发现问题与分析"
+    type: "issue_tracker"
+    issue_categories:
+      - "性能退化"
+      - "边界用例"
+      - "数据偏差"
+      - "模型漂移"
+    prompts:
+      - "识别实验中发现的关键问题和异常"
+      - "分析问题的根本原因和影响范围"
+    data_sources:
+      - "experiment_issues_log"
+      - "anomaly_detection_results"
+
+  - id: "recommendations"
+    title: "改进建议"
+    type: "action_plan"
+    recommendation_types:
+      - "短期优化"
+      - "中期规划"
+      - "长期战略"
+    prompts:
+      - "基于实验结果提出具体的改进建议"
+      - "优先级排序和实施时间表"
+    data_sources:
+      - "improvement_opportunities"
+      - "resource_requirements"
+
+rag_config:
+  retrieval_methods:
+    - "hyde_approach"
+    - "multi_faceted_filtering"
+    - "intelligent_reranking"
+  knowledge_sources:
+    - "experiment_logs"
+    - "model_configs"
+    - "performance_benchmarks"
+    - "research_papers"
+
+output_formats:
+  - format: "markdown"
+    template: "experiment_report.md.j2"
+  - format: "pptx"
+    template: "experiment_report.pptx.j2"
+  - format: "jupyter_notebook"
+    template: "experiment_analysis.ipynb.j2"
+
+validation:
+  data_quality_check: true
+  statistical_validity: true
+  reproducibility_check: true

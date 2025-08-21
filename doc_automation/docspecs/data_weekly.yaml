@@ -1,0 +1,226 @@
+# 数据周报规格模板
+name: "数据分析周报"
+type: "data_weekly"
+version: "1.0.0"
+
+metadata:
+  title: "内容审核数据周报"
+  subtitle: "第{{ week_number }}周 ({{ start_date }} - {{ end_date }})"
+  author: "数据分析团队"
+  created_at: "{{ timestamp }}"
+  report_period: "weekly"
+
+sections:
+  - id: "executive_summary"
+    title: "核心亮点"
+    type: "highlight_cards"
+    cards:
+      - title: "本周处理量"
+        value: "{{ total_processed }}"
+        change: "{{ volume_change }}"
+        trend: "{{ volume_trend }}"
+      - title: "整体通过率"
+        value: "{{ overall_pass_rate }}"
+        change: "{{ pass_rate_change }}"
+        trend: "{{ pass_rate_trend }}"
+      - title: "平均处理时长"
+        value: "{{ avg_processing_time }}"
+        change: "{{ time_change }}"
+        trend: "{{ time_trend }}"
+      - title: "升级案件数"
+        value: "{{ escalated_cases }}"
+        change: "{{ escalation_change }}"
+        trend: "{{ escalation_trend }}"
+
+  - id: "volume_analysis"
+    title: "处理量分析"
+    type: "multi_chart"
+    charts:
+      - type: "line_chart"
+        title: "日处理量趋势"
+        data_source: "daily_volume_trend"
+        metrics: ["total", "auto_approved", "manual_review", "rejected"]
+      - type: "pie_chart"
+        title: "内容类型分布"
+        data_source: "content_type_distribution"
+      - type: "stacked_bar"
+        title: "平台来源分析"
+        data_source: "platform_volume_breakdown"
+
+  - id: "efficiency_metrics"
+    title: "审核效能指标"
+    type: "metrics_dashboard"
+    kpi_groups:
+      - title: "准确性指标"
+        metrics:
+          - name: "整体准确率"
+            current: "{{ overall_accuracy }}"
+            target: ">= 95%"
+            trend: "{{ accuracy_trend }}"
+          - name: "误杀率"
+            current: "{{ false_positive_rate }}"
+            target: "<= 2%"
+            trend: "{{ fp_trend }}"
+          - name: "漏判率"
+            current: "{{ false_negative_rate }}"
+            target: "<= 1%"
+            trend: "{{ fn_trend }}"
+      
+      - title: "效率指标"
+        metrics:
+          - name: "平均处理时长"
+            current: "{{ avg_processing_time }}"
+            target: "<= 30s"
+            trend: "{{ time_trend }}"
+          - name: "SLA达成率"
+            current: "{{ sla_achievement }}"
+            target: ">= 99%"
+            trend: "{{ sla_trend }}"
+          - name: "系统可用性"
+            current: "{{ system_uptime }}"
+            target: ">= 99.9%"
+            trend: "{{ uptime_trend }}"
+
+      - title: "质量指标"
+        metrics:
+          - name: "人工复审一致性"
+            current: "{{ human_consistency }}"
+            target: ">= 90%"
+            trend: "{{ consistency_trend }}"
+          - name: "升级案件比例"
+            current: "{{ escalation_ratio }}"
+            target: "<= 5%"
+            trend: "{{ escalation_trend }}"
+
+  - id: "risk_distribution"
+    title: "风险分布分析"
+    type: "risk_heatmap"
+    dimensions:
+      - "内容类型"
+      - "风险等级"
+      - "处理结果"
+    data_sources:
+      - "risk_level_distribution"
+      - "content_risk_mapping"
+
+  - id: "model_performance"
+    title: "模型性能监控"
+    type: "model_dashboard"
+    models:
+      - name: "视觉检测模型"
+        id: "vision_model"
+        metrics: ["accuracy", "latency", "throughput"]
+      - name: "文本分析模型"
+        id: "text_model"
+        metrics: ["accuracy", "latency", "throughput"]
+      - name: "语音识别模型"
+        id: "asr_model"
+        metrics: ["accuracy", "latency", "throughput"]
+    data_sources:
+      - "model_performance_metrics"
+
+  - id: "anomaly_detection"
+    title: "异常检测"
+    type: "anomaly_report"
+    anomaly_types:
+      - "流量异常"
+      - "准确率异常"
+      - "延迟异常"
+      - "错误率异常"
+    prompts:
+      - "识别本周数据中的异常模式"
+      - "分析异常的可能原因和影响"
+    data_sources:
+      - "anomaly_detection_results"
+      - "alert_history"
+
+  - id: "geographic_analysis"
+    title: "地域分析"
+    type: "geo_dashboard"
+    visualizations:
+      - type: "choropleth_map"
+        title: "地域处理量分布"
+        data_source: "geographic_volume"
+      - type: "bar_chart"
+        title: "各地区风险类型分布"
+        data_source: "regional_risk_distribution"
+
+  - id: "user_behavior"
+    title: "用户行为分析"
+    type: "behavior_analysis"
+    segments:
+      - "新用户"
+      - "活跃用户"
+      - "高风险用户"
+    data_sources:
+      - "user_segment_analysis"
+      - "behavior_pattern_detection"
+
+  - id: "cost_analysis"
+    title: "成本分析"
+    type: "cost_dashboard"
+    cost_categories:
+      - "计算成本"
+      - "存储成本"
+      - "人工成本"
+      - "第三方服务成本"
+    data_sources:
+      - "cost_breakdown"
+      - "resource_utilization"
+
+  - id: "trend_forecast"
+    title: "趋势预测"
+    type: "forecast_chart"
+    forecast_metrics:
+      - "下周预期处理量"
+      - "风险趋势预测"
+      - "资源需求预测"
+    prompts:
+      - "基于历史数据预测下周趋势"
+      - "识别需要关注的风险点"
+    data_sources:
+      - "historical_trends"
+      - "forecast_models"
+
+  - id: "action_items"
+    title: "行动项"
+    type: "action_tracker"
+    categories:
+      - "紧急处理"
+      - "优化建议"
+      - "监控重点"
+    prompts:
+      - "基于本周数据提出具体行动建议"
+      - "确定优先级和责任人"
+
+rag_config:
+  retrieval_methods:
+    - "fusion_retrieval"
+    - "contextual_compression"
+    - "relevant_segment_extraction"
+  knowledge_sources:
+    - "historical_reports"
+    - "performance_baselines"
+    - "operational_playbooks"
+
+output_formats:
+  - format: "html"
+    template: "data_weekly.html.j2"
+    charts: "echarts"
+  - format: "pdf"
+    template: "data_weekly.pdf.j2"
+  - format: "email"
+    template: "data_weekly_email.html.j2"
+
+automation:
+  schedule: "0 8 * * MON"  # 每周一早8点
+  auto_send: true
+  recipients:
+    - "content-safety@company.com"
+    - "data-team@company.com"
+    - "management@company.com"
+
+validation:
+  data_freshness_check: true
+  metric_consistency_check: true
+  chart_rendering_test: true

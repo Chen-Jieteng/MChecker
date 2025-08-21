@@ -1,0 +1,47 @@
+# 核心依赖
+dagster>=1.7.0
+dbt-core>=1.7.0
+dbt-duckdb>=1.7.0
+
+# RAG 检索
+milvus>=2.4.0
+pymilvus>=2.4.0
+sentence-transformers>=2.7.0
+FlagEmbedding>=1.2.0
+
+# 数据处理
+pandas>=2.1.0
+numpy>=1.24.0
+duckdb>=0.10.0
+sqlalchemy>=2.0.0
+
+# LLM 调用
+dashscope>=1.17.0
+openai>=1.35.0
+langchain>=0.2.0
+langchain-community>=0.2.0
+
+# 文档生成
+jinja2>=3.1.0
+markdown>=3.5.0
+python-docx>=1.1.0
+python-pptx>=0.6.0
+marp-cli>=3.4.0
+
+# 图表生成
+plotly>=5.17.0
+matplotlib>=3.8.0
+seaborn>=0.13.0
+
+# 发布集成
+requests>=2.31.0
+confluence-api>=1.4.0
+gitpython>=3.1.0
+
+# 评测工具
+deepeval>=0.21.0
+ragas>=0.1.0
+
+# 可观测
+langfuse>=2.20.0
+opentelemetry-api>=1.21.0

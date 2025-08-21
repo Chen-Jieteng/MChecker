@@ -1,0 +1,330 @@
+# PRD文档规格模板
+name: "产品需求文档"
+type: "prd_document"
+version: "1.0.0"
+
+metadata:
+  title: "{{ product_name }} PRD"
+  subtitle: "{{ feature_name }} 功能需求文档"
+  author: "{{ product_owner }}"
+  created_at: "{{ timestamp }}"
+  version: "{{ prd_version }}"
+  status: "{{ document_status }}"
+
+sections:
+  - id: "document_info"
+    title: "文档信息"
+    type: "metadata_table"
+    fields:
+      - "产品名称"
+      - "功能模块"
+      - "产品经理"
+      - "技术负责人"
+      - "设计负责人"
+      - "预计工期"
+      - "优先级"
+      - "文档版本"
+
+  - id: "executive_summary"
+    title: "产品概述"
+    type: "executive_brief"
+    prompts:
+      - "简要描述产品的核心价值和定位"
+      - "突出产品解决的关键问题和目标用户"
+    data_sources:
+      - "product_vision"
+      - "market_research"
+
+  - id: "business_background"
+    title: "业务背景"
+    type: "context_analysis"
+    subsections:
+      - title: "市场机会"
+        data_source: "market_opportunity"
+      - title: "竞品分析"
+        data_source: "competitor_analysis"
+      - title: "用户痛点"
+        data_source: "user_pain_points"
+      - title: "商业价值"
+        data_source: "business_value"
+
+  - id: "user_research"
+    title: "用户研究"
+    type: "user_analysis"
+    personas:
+      - name: "内容审核员"
+        characteristics:
+          - "工作经验"
+          - "技能水平"
+          - "工作场景"
+          - "痛点需求"
+        user_journey: "audit_workflow_journey"
+      
+      - name: "策略配置人员"
+        characteristics:
+          - "业务背景"
+          - "决策权限"
+          - "使用频率"
+          - "期望结果"
+        user_journey: "policy_config_journey"
+      
+      - name: "数据分析师"
+        characteristics:
+          - "分析技能"
+          - "工具偏好"
+          - "报告需求"
+          - "时效要求"
+        user_journey: "data_analysis_journey"
+
+  - id: "requirements_overview"
+    title: "需求总览"
+    type: "requirements_matrix"
+    requirement_types:
+      - "功能需求"
+      - "性能需求"
+      - "安全需求"
+      - "易用性需求"
+    priority_levels:
+      - "P0 - 必须有"
+      - "P1 - 应该有"
+      - "P2 - 可以有"
+      - "P3 - 暂不考虑"
+
+  - id: "functional_requirements"
+    title: "功能需求详述"
+    type: "feature_specification"
+    features:
+      - id: "automated_review"
+        name: "自动化审核"
+        priority: "P0"
+        user_stories:
+          - "作为审核员，我希望系统能自动处理低风险内容，以提高工作效率"
+          - "作为管理员，我希望能配置自动审核规则，以适应不同场景"
+        acceptance_criteria:
+          - "支持多模态内容自动检测"
+          - "可配置风险阈值"
+          - "提供决策解释"
+        mockups: "auto_review_mockups"
+      
+      - id: "manual_review_workspace"
+        name: "人工审核工作台"
+        priority: "P0"
+        user_stories:
+          - "作为审核员，我希望有统一的工作界面，能高效处理复杂案例"
+          - "作为团队负责人，我希望能监控审核质量和效率"
+        acceptance_criteria:
+          - "支持多种内容格式展示"
+          - "提供丰富的决策工具"
+          - "记录详细的操作日志"
+        mockups: "manual_review_mockups"
+
+  - id: "user_scenarios"
+    title: "用户场景"
+    type: "scenario_mapping"
+    scenarios:
+      - name: "日常内容审核"
+        context: "审核员处理常规内容审核任务"
+        steps:
+          - "登录系统查看待审核队列"
+          - "按优先级处理案例"
+          - "使用AI辅助做出决策"
+          - "记录审核结果和理由"
+        pain_points:
+          - "案例信息展示不够直观"
+          - "决策工具使用复杂"
+        solution: "redesign_review_interface"
+      
+      - name: "紧急策略调整"
+        context: "发现误判需要快速调整策略"
+        steps:
+          - "识别问题并评估影响"
+          - "调整相关规则阈值"
+          - "验证调整效果"
+          - "通知相关团队"
+        pain_points:
+          - "策略调整流程复杂"
+          - "影响评估工具缺失"
+        solution: "streamline_policy_management"
+
+  - id: "interface_design"
+    title: "交互设计"
+    type: "ui_specification"
+    design_principles:
+      - "简洁直观"
+      - "信息层次清晰"
+      - "操作路径最短"
+      - "响应及时反馈"
+    page_layouts:
+      - name: "审核工作台"
+        wireframe: "audit_workspace_wireframe"
+        components:
+          - "内容展示区"
+          - "决策工具栏"
+          - "历史记录面板"
+          - "AI建议区域"
+      - name: "数据看板"
+        wireframe: "dashboard_wireframe"
+        components:
+          - "关键指标卡片"
+          - "趋势图表"
+          - "告警通知"
+          - "快捷操作"
+
+  - id: "api_specifications"
+    title: "API接口设计"
+    type: "api_documentation"
+    endpoints:
+      - path: "/api/v1/audit/submit"
+        method: "POST"
+        description: "提交内容进行审核"
+        request_schema: "audit_submit_request"
+        response_schema: "audit_submit_response"
+      
+      - path: "/api/v1/audit/result/{audit_id}"
+        method: "GET"
+        description: "获取审核结果"
+        parameters:
+          - "audit_id: 审核任务ID"
+        response_schema: "audit_result_response"
+      
+      - path: "/api/v1/policy/rules"
+        method: "GET"
+        description: "获取策略规则列表"
+        response_schema: "policy_rules_response"
+
+  - id: "data_model"
+    title: "数据模型"
+    type: "data_schema"
+    entities:
+      - name: "审核任务"
+        fields:
+          - "task_id: 任务唯一标识"
+          - "content_type: 内容类型"
+          - "content_url: 内容链接"
+          - "risk_score: 风险评分"
+          - "status: 审核状态"
+          - "reviewer_id: 审核员ID"
+          - "created_at: 创建时间"
+          - "updated_at: 更新时间"
+      
+      - name: "审核结果"
+        fields:
+          - "result_id: 结果唯一标识"
+          - "task_id: 关联任务ID"
+          - "decision: 审核决策"
+          - "confidence: 置信度"
+          - "evidence: 证据信息"
+          - "reviewer_notes: 审核备注"
+
+  - id: "technical_constraints"
+    title: "技术约束"
+    type: "constraint_specification"
+    performance_requirements:
+      - "响应时间 < 500ms (P95)"
+      - "并发处理 > 1000 QPS"
+      - "系统可用性 > 99.9%"
+    scalability_requirements:
+      - "支持水平扩展"
+      - "存储容量可弹性调整"
+      - "计算资源按需分配"
+    security_requirements:
+      - "数据传输加密"
+      - "访问权限控制"
+      - "操作日志审计"
+
+  - id: "success_metrics"
+    title: "成功标准"
+    type: "metrics_definition"
+    business_metrics:
+      - name: "用户满意度"
+        definition: "用户对产品功能的满意度评分"
+        target: "> 4.0/5.0"
+        measurement: "月度用户调研"
+      
+      - name: "工作效率提升"
+        definition: "单位时间处理案例数量提升"
+        target: "> 30%"
+        measurement: "使用前后对比"
+    
+    technical_metrics:
+      - name: "系统响应时间"
+        definition: "用户操作到系统响应的时间"
+        target: "< 500ms"
+        measurement: "实时监控"
+      
+      - name: "错误率"
+        definition: "系统错误占总请求的比例"
+        target: "< 0.1%"
+        measurement: "日志分析"
+
+  - id: "implementation_plan"
+    title: "实施计划"
+    type: "project_timeline"
+    phases:
+      - name: "需求分析"
+        duration: "2周"
+        deliverables:
+          - "需求确认文档"
+          - "技术方案设计"
+      
+      - name: "原型开发"
+        duration: "4周"
+        deliverables:
+          - "核心功能原型"
+          - "用户体验验证"
+      
+      - name: "开发实现"
+        duration: "8周"
+        deliverables:
+          - "功能开发完成"
+          - "集成测试通过"
+      
+      - name: "上线发布"
+        duration: "2周"
+        deliverables:
+          - "生产环境部署"
+          - "用户培训完成"
+
+  - id: "risk_assessment"
+    title: "风险评估"
+    type: "risk_matrix"
+    risks:
+      - name: "技术实现复杂度高"
+        probability: "中"
+        impact: "高"
+        mitigation: "提前技术预研，分阶段实现"
+      
+      - name: "用户接受度不足"
+        probability: "低"
+        impact: "中"
+        mitigation: "早期用户参与设计，充分培训"
+      
+      - name: "性能指标达不到要求"
+        probability: "中"
+        impact: "高"
+        mitigation: "性能测试前置，优化架构设计"
+
+rag_config:
+  retrieval_methods:
+    - "graph_rag"
+    - "self_rag"
+    - "corrective_rag"
+  knowledge_sources:
+    - "product_specs"
+    - "user_feedback"
+    - "technical_docs"
+    - "industry_standards"
+
+output_formats:
+  - format: "docx"
+    template: "prd_document.docx.j2"
+  - format: "confluence"
+    template: "prd_confluence.html.j2"
+  - format: "notion"
+    template: "prd_notion.md.j2"
+
+validation:
+  requirement_completeness: true
+  technical_feasibility: true
+  business_alignment: true
+  stakeholder_review: true

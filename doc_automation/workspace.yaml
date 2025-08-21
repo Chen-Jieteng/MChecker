@@ -1,0 +1,20 @@
+# Dagster 工作空间配置
+load_from:
+  - python_package: doc_automation.pipelines
+
+telemetry:
+  enabled: false
+
+storage:
+  filesystem:
+    base_dir: dagster_storage
+
+run_launcher:
+  module: dagster._core.launcher.sync_in_memory_run_launcher
+  class: SyncInMemoryRunLauncher
+
+compute_logs:
+  module: dagster._core.storage.local_compute_log_manager
+  class: LocalComputeLogManager
+  config:
+    base_dir: dagster_storage/compute_logs

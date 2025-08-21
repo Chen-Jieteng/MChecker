@@ -1,0 +1,246 @@
+# 培训材料规格模板
+name: "培训与沟通材料"
+type: "training_materials"
+version: "1.0.0"
+
+metadata:
+  title: "{{ training_title }}"
+  subtitle: "{{ training_type }}培训材料"
+  author: "培训发展部 & 内容安全团队"
+  created_at: "{{ timestamp }}"
+  target_audience: "{{ audience }}"
+  duration: "{{ estimated_duration }}"
+
+sections:
+  - id: "training_overview"
+    title: "培训概述"
+    type: "overview_slide"
+    content:
+      - "培训目标"
+      - "适用对象"
+      - "预期收益"
+      - "培训大纲"
+    prompts:
+      - "清晰阐述培训的目标和价值"
+      - "说明参训人员的收益和能力提升"
+
+  - id: "business_context"
+    title: "业务背景"
+    type: "context_slides"
+    subsections:
+      - title: "行业现状"
+        data_source: "industry_overview"
+      - title: "业务挑战"
+        data_source: "business_challenges"
+      - title: "解决方案价值"
+        data_source: "solution_value_prop"
+    visual_elements:
+      - "industry_statistics_chart"
+      - "challenge_impact_diagram"
+
+  - id: "audit_process_flow"
+    title: "审核流程详解"
+    type: "process_tutorial"
+    flow_diagram:
+      type: "mermaid"
+      interactive: true
+    step_details:
+      - step: "内容接入"
+        description: "多平台内容统一接入"
+        tools: ["API网关", "消息队列"]
+        demo: "live_demo_1"
+      - step: "预处理"
+        description: "格式标准化与特征提取"
+        tools: ["FFmpeg", "OCR引擎"]
+        demo: "live_demo_2"
+      - step: "AI检测"
+        description: "多模态风险识别"
+        tools: ["视觉模型", "文本模型", "语音模型"]
+        demo: "live_demo_3"
+      - step: "人工审核"
+        description: "复杂案例人工判断"
+        tools: ["审核工作台", "决策支持系统"]
+        demo: "live_demo_4"
+
+  - id: "strategy_interpretation"
+    title: "策略解读"
+    type: "policy_explanation"
+    policy_categories:
+      - name: "内容安全策略"
+        subcategories:
+          - "暴力恐怖"
+          - "色情低俗"
+          - "违法犯罪"
+          - "虚假信息"
+        case_studies: true
+      - name: "用户行为策略"
+        subcategories:
+          - "恶意注册"
+          - "刷量作弊"
+          - "恶意营销"
+        case_studies: true
+    data_sources:
+      - "policy_documents"
+      - "case_study_database"
+
+  - id: "model_capabilities"
+    title: "模型能力介绍"
+    type: "capability_showcase"
+    models:
+      - name: "视觉检测模型"
+        capabilities:
+          - "物体识别"
+          - "场景理解"
+          - "人脸检测"
+          - "文字识别"
+        limitations:
+          - "小目标检测精度有限"
+          - "复杂场景误报率较高"
+        demo_cases: "vision_demo_cases"
+      
+      - name: "文本分析模型"
+        capabilities:
+          - "情感分析"
+          - "意图识别"
+          - "实体抽取"
+          - "关系推理"
+        limitations:
+          - "隐喻表达理解困难"
+          - "上下文依赖性强"
+        demo_cases: "text_demo_cases"
+      
+      - name: "语音识别模型"
+        capabilities:
+          - "语音转文字"
+          - "情绪识别"
+          - "说话人识别"
+        limitations:
+          - "方言识别准确率低"
+          - "噪音环境表现差"
+        demo_cases: "audio_demo_cases"
+
+  - id: "tools_operation"
+    title: "工具使用指南"
+    type: "hands_on_tutorial"
+    tools:
+      - name: "审核工作台"
+        sections:
+          - "界面导航"
+          - "案例处理"
+          - "决策记录"
+          - "质量反馈"
+        interactive_demo: true
+      
+      - name: "数据监控台"
+        sections:
+          - "实时监控"
+          - "趋势分析"
+          - "告警处理"
+          - "报表生成"
+        interactive_demo: true
+      
+      - name: "策略配置台"
+        sections:
+          - "规则编辑"
+          - "阈值调整"
+          - "A/B测试"
+          - "版本管理"
+        interactive_demo: true
+
+  - id: "cross_dept_communication"
+    title: "跨部门协作"
+    type: "collaboration_guide"
+    departments:
+      - name: "算法团队"
+        role: "模型开发与优化"
+        interfaces: ["API接口", "性能指标", "样本标注"]
+        communication_channels: ["技术评审", "周例会", "问题跟踪"]
+      
+      - name: "风控团队"
+        role: "策略制定与风险评估"
+        interfaces: ["策略配置", "风险报告", "应急响应"]
+        communication_channels: ["策略评审", "风险例会", "紧急通道"]
+      
+      - name: "产研团队"
+        role: "产品设计与开发"
+        interfaces: ["需求文档", "用户反馈", "功能迭代"]
+        communication_channels: ["产品评审", "用户调研", "技术对接"]
+
+  - id: "emergency_procedures"
+    title: "应急预案"
+    type: "emergency_playbook"
+    scenarios:
+      - name: "大规模误杀"
+        triggers: ["误杀率突增", "用户投诉激增"]
+        response_steps:
+          - "立即暂停相关策略"
+          - "分析误杀原因"
+          - "回滚至稳定版本"
+          - "通知相关团队"
+        escalation_path: "技术负责人 -> 部门总监 -> VP"
+      
+      - name: "系统故障"
+        triggers: ["服务不可用", "响应时间异常"]
+        response_steps:
+          - "启动备用系统"
+          - "定位故障原因"
+          - "修复关键路径"
+          - "恢复服务验证"
+        escalation_path: "运维团队 -> 技术总监 -> CTO"
+
+  - id: "qa_session"
+    title: "常见问题解答"
+    type: "faq_section"
+    categories:
+      - "技术相关"
+      - "策略相关"
+      - "操作相关"
+      - "协作相关"
+    data_sources:
+      - "support_tickets"
+      - "training_feedback"
+      - "user_questions"
+
+  - id: "assessment"
+    title: "培训考核"
+    type: "assessment"
+    question_types:
+      - "选择题"
+      - "判断题"
+      - "案例分析"
+      - "实操演示"
+    passing_score: 80
+
+rag_config:
+  retrieval_methods:
+    - "hierarchical_indices"
+    - "document_augmentation"
+    - "explainable_retrieval"
+  knowledge_sources:
+    - "training_manuals"
+    - "best_practices"
+    - "case_studies"
+    - "user_feedback"
+
+output_formats:
+  - format: "pptx"
+    template: "training_slides.pptx.j2"
+    style: "corporate"
+  - format: "html"
+    template: "interactive_tutorial.html.j2"
+    interactive: true
+  - format: "pdf"
+    template: "training_handbook.pdf.j2"
+  - format: "video_script"
+    template: "training_video.txt.j2"
+
+customization:
+  audience_adaptation: true
+  difficulty_levels: ["初级", "中级", "高级"]
+  language_options: ["中文", "英文"]
+  delivery_modes: ["现场培训", "在线培训", "自学材料"]
+
+validation:
+  content_accuracy: true
+  accessibility_check: true
+  engagement_metrics: true
