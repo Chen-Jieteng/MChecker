@@ -7,7 +7,7 @@
 ![Vue](https://img.shields.io/badge/vue-3.x-brightgreen.svg)
 ![FastAPI](https://img.shields.io/badge/fastapi-0.68+-red.svg)
 
-** 全球首个开源AI内容审核全流程自动化平台**
+**🚀 开源AI内容审核全流程自动化平台**
 
 一个集成多模态AI分析、实时流式处理、智能决策的完整内容审核解决方案
 
