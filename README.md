@@ -1,4 +1,3 @@
-# MChecker - AI内容审核智能体平台
 
 <div align="center">
 
