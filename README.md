@@ -17,7 +17,7 @@
 项目可能会有业务及专业性上的偏差，作者属技术背景，业务能力仍然无限的上升潜力，若有错误请通过Issues指正，谢谢大家。
 
 ## 项目架构
-![进度](https://github.com/Chen-Jieteng/MChecker/blob/main/%E4%B8%8B%E8%BD%BD.png)
+![进度](https://github.com/Chen-Jieteng/MChecker/blob/main/readme_images/%E4%B8%8B%E8%BD%BD.png)
 
 ## 审核流程demo：
 （视频）
@@ -27,10 +27,10 @@
 
 ## 审核平台页面
 - 页面全貌（分为四个部分，左上为APP显示部分，右上为机审内容部分，左下为数据标注部分，右下为人工审批部分）
-- APP显示部分：以短视频为例，左边（短视频），右边（评论区）
-![APP显示部分]()
+<img src="https://github.com/Chen-Jieteng/MChecker/blob/main/readme_images/%E9%A6%96%E9%A1%B5.png" width="60%">
 
-![机审内容部分]()
+- APP显示部分：以短视频为例，左边（短视频），右边（评论区）
+<img src="https://github.com/Chen-Jieteng/MChecker/blob/main/readme_images/APP%E9%83%A8%E5%88%86.png" width="40%">
 
 模型监控：
 - 机审内容部分：实时状态、三种模型的版本管理面板（可以切换实验模型），实时报警模块、三个线上部署模型的数据面板（版本号，部署时间，模型类型，状态，平均准确率,延迟率，mAP，处理个数，GPU占用比例）
@@ -38,39 +38,33 @@
 - 严重程度占比（低，中，高，封禁）
 - 置信度分布图
 - 近7天的模型评估（准确率，精确度，F1值，召回率，AUC，微观AUC，宏观AUC，MAP@0.5, MAP@0.75, MAP@0.5:0.95, AVG-IOU，IOU-Threshold，FPS，时延，吞吐量，风险检测值，FPR，FNR，宏观F1，加权F1，Top1准确率，Top3准确率，Top5准确率，AVG-CONF，CONF-Threashold，平衡，Cohen-K值，Matthews-P值）
-
-模型触发规则，包括视觉规则，语音规则，文本规则，编号，描述，权重值
-（图片）
-
-特征贡献度分析
-
-提示词配置
-（图片）
-提示此版本管理和性能分析
-（图片）
+<img src="https://github.com/Chen-Jieteng/MChecker/blob/main/readme_images/%E6%9C%BA%E5%AE%A1%E7%9B%91%E6%8E%A7.png" width="100%">
+- 模型触发规则，包括视觉规则，语音规则，文本规则，编号，描述，权重值
+- 提示词配置
+- 提示此版本管理和性能分析
 
 推理过程日志：
-（图片）
-
-推理设置：执行步数上线（默认15），频率默认2秒，是否启动ASR，采样温度（默认0.3），top_p值默认0.9
-
-
+- 推理过程
+- 推理设置：执行步数上线（默认15），频率默认2秒，是否启动ASR，采样温度（默认0.3），top_p值默认0.9
+<img src="https://github.com/Chen-Jieteng/MChecker/blob/main/readme_images/%E6%8E%A8%E7%90%86%E8%BF%87%E7%A8%8B%E6%97%A5%E5%BF%97.png" width="60%">
 
 
+数据标注部分：
+- 数据标注 
+<img src="https://github.com/Chen-Jieteng/MChecker/blob/main/readme_images/%E6%95%B0%E6%8D%AE%E6%A0%87%E6%B3%A8.png" width="100%">
 
-- 数据标注部分
-![数据标注部分]()
-- 人工审批部分
-![人工审批部分]()
 
+人工审批部分
+- 人工审核部分
+<img src="https://github.com/Chen-Jieteng/MChecker/blob/main/readme_images/%E4%BA%BA%E5%B7%A5%E5%AE%A1%E6%A0%B8.png" width="100%">
+ 
 - 审核结果窗口
-（图片）
-
-- 左拉菜单
-（图片）
+  
 
 - 文档生成
-（图片）
+<img src="https://github.com/Chen-Jieteng/MChecker/blob/main/readme_images/%E6%99%BA%E8%83%BD%E6%96%87%E6%A1%A3%E7%94%9F%E6%88%90.png" width="60%">
+生成的文档示例：产品经理PDE文件
+
 
 
 ## 智能体模式
