@@ -19,3 +19,4 @@ uvicorn agent_backend.main:app --host 0.0.0.0 --port 8799 --reload
 > 后续接入：
 > 1) /extract: 抽帧+OCR+NSFW+转写 → structured context
 > 2) /judge: LLM 审核引擎（DashScope）
+ 
