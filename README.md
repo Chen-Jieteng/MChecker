@@ -62,7 +62,7 @@ cp .env.example .env  # 配置API密钥
 python main.py
 
 # 3. 前端界面
-cd douyin
+cd MChecker
 npm install
 npm run dev
 
@@ -386,7 +386,6 @@ git push origin feature/your-feature
 
 ###  联系方式
 -  **问题反馈** - [GitHub Issues](https://github.com/Chen-Jieteng/MChecker/issues)
--  **功能建议** - [GitHub Discussions](https://github.com/Chen-Jieteng/MChecker/discussions)
 -  **商务合作** - 通过GitHub联系
 
 ---
@@ -396,7 +395,7 @@ git push origin feature/your-feature
 ### ⭐ 如果这个项目对你有帮助，请给一个Star！
 
 
-**让AI让内容审核更智能、更高效！** 
+**让AI使得内容审核更智能、更高效！** 
 
 </div>
 
