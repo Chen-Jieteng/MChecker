@@ -13,7 +13,7 @@
     "type-check": "vue-tsc --build --force -p douyin/tsconfig.app.json",
     "lint": "eslint --fix douyin --ext .vue,.js,.ts,.tsx,.jsx,.cjs,.mjs --fix --ignore-path .gitignore",
     "format": "prettier --write douyin/src/",
-    "prepare": "husky",
+    "prepare": "husky", 
     "commit": "git-cz"
   },
   "dependencies": {
