@@ -7,7 +7,7 @@
   "compilerOptions": {
     "baseUrl": ".",
     "paths": {
-      "@/*": ["douyin/src/*"]
+      "@/*": ["douyin/src/*"] 
     }
   }
 }
