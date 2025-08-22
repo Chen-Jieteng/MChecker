@@ -124,7 +124,7 @@ const contrib = ref([
   { name: 'OCR: ContactInfo', value: -0.05 }
 ])
 </script>
-
+ 
 <style scoped lang="less">
 .llm-panel { display: flex; flex-direction: column; gap: 12px; padding: 12px; }
 .llm-meta { display: flex; justify-content: space-between; align-items: flex-end; padding: 10px 12px; background: #121212; border: 1px solid #222; border-radius: 10px; }
